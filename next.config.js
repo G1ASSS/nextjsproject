@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/G1AS5',
-  assetPrefix: '/G1AS5',
+  basePath: '/nextjsproject',
+  assetPrefix: '/nextjsproject',
   trailingSlash: true,
   images: {
     unoptimized: true,
@@ -21,6 +21,8 @@ const nextConfig = {
       },
     ],
   },
+  // Disable static generation for dynamic routes
+  generateStaticParams: false,
 }
 
 module.exports = nextConfig
