@@ -6,14 +6,15 @@ import { getToolById, Tool } from '@/lib/tools'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 
 interface ToolPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: ToolPageProps): Promise<Metadata> {
   try {
-    const tool = await getToolById(params.id)
+    const { id } = await params
+    const tool = await getToolById(id)
     
     if (!tool) {
       return {
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: ToolPageProps): Promise<Metad
       },
     }
   } catch (error) {
+    console.error('Error generating tool metadata:', error)
     return {
       title: 'Tool',
     }
@@ -38,10 +40,13 @@ export async function generateMetadata({ params }: ToolPageProps): Promise<Metad
 }
 
 export default async function ToolPage({ params }: ToolPageProps) {
+  const { id } = await params
   let tool: Tool | null = null
   
   try {
-    tool = await getToolById(params.id)
+    console.log('Fetching tool with ID:', id)
+    tool = await getToolById(id)
+    console.log('Tool fetched:', tool)
   } catch (error) {
     console.error('Error fetching tool:', error)
   }

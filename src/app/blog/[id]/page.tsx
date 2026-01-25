@@ -6,14 +6,15 @@ import { getBlogPost, BlogPost } from '@/lib/blog'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   try {
-    const post = await getBlogPost(params.id)
+    const { id } = await params
+    const post = await getBlogPost(id)
     
     if (!post) {
       return {
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       },
     }
   } catch (error) {
+    console.error('Error generating blog metadata:', error)
     return {
       title: 'Blog Post',
     }
@@ -38,10 +40,13 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { id } = await params
   let post: BlogPost | null = null
   
   try {
-    post = await getBlogPost(params.id)
+    console.log('Fetching blog post with ID:', id)
+    post = await getBlogPost(id)
+    console.log('Blog post fetched:', post)
   } catch (error) {
     console.error('Error fetching blog post:', error)
   }

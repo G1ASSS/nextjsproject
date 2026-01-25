@@ -6,14 +6,15 @@ import { getProjectById, Project } from '@/lib/projects'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 
 interface ProjectPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   try {
-    const project = await getProjectById(params.id)
+    const { id } = await params
+    const project = await getProjectById(id)
     
     if (!project) {
       return {
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
       },
     }
   } catch (error) {
+    console.error('Error generating project metadata:', error)
     return {
       title: 'Project',
     }
@@ -38,10 +40,13 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
+  const { id } = await params
   let project: Project | null = null
   
   try {
-    project = await getProjectById(params.id)
+    console.log('Fetching project with ID:', id)
+    project = await getProjectById(id)
+    console.log('Project fetched:', project)
   } catch (error) {
     console.error('Error fetching project:', error)
   }
