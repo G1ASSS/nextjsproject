@@ -1,10 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static export for GitHub Pages
-  output: 'export',
-  basePath: '/nextjsproject',
-  assetPrefix: '/nextjsproject',
-  trailingSlash: true,
+  // Only enable static export for GitHub Pages (not for Vercel)
+  ...(process.env.VERCEL ? {} : {
+    output: 'export',
+    basePath: '/nextjsproject',
+    assetPrefix: '/nextjsproject',
+    trailingSlash: true,
+  }),
   images: {
     unoptimized: true,
     remotePatterns: [
