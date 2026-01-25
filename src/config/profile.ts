@@ -34,13 +34,6 @@ export const PROFILE_CONFIG = {
       image: 'https://placehold.co/100x100/00d4aa/ffffff?text=CS+',
       verifyUrl: 'https://www.eccouncil.org/verify'
     },
-    {
-      id: 'tryhackme-pathway',
-      title: 'Complete Beginner',
-      issuer: 'TryHackMe',
-      date: '2024',
-      image: 'https://placehold.co/100x100/ff0000/ffffff?text=THM',
-      verifyUrl: 'https://tryhackme.com/p/completer'
-    }
+    
   ]
 };
