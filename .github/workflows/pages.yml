@@ -35,8 +35,14 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Prepare GitHub Pages build
+      run: node scripts/build-github-pages.js
+
     - name: Build
       run: npm run build
+
+    - name: Restore dynamic routes
+      run: node scripts/restore-dynamic-routes.js
 
     - name: Setup Pages
       uses: actions/configure-pages@v4

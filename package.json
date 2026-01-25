@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:github": "node scripts/build-github-pages.js && next build && node scripts/restore-dynamic-routes.js",
     "start": "next start",
     "lint": "eslint",
     "export": "next build && next export"
