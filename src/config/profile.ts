@@ -1,7 +1,7 @@
 export const PROFILE_CONFIG = {
   name: 'G1ASS',
   role: 'Cybersecurity & Web Developer',
-  imageUrl: 'https://placehold.co/400x400/0a0a0a/00ffff?text=G1ASS',
+  imageUrl: '/img/profile.jpg',
   bio: 'Digital sanctuary where cybersecurity expertise meets modern web development.',
   socialLinks: {
     facebook: 'https://facebook.com/g1as5',

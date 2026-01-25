@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  basePath: '/nextjsproject',
-  assetPrefix: '/nextjsproject',
-  trailingSlash: true,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -21,8 +17,6 @@ const nextConfig = {
       },
     ],
   },
-  // Disable static generation for dynamic routes
-  generateStaticParams: false,
 }
 
 module.exports = nextConfig
