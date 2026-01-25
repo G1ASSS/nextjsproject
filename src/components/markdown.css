@@ -1,0 +1,215 @@
+/* Custom styles for markdown content to match glassmorphism theme */
+
+/* Base prose styles for dark theme */
+.prose {
+  color: #e5e7eb;
+  max-width: none;
+}
+
+/* Headings */
+.prose h1 {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.prose h2 {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.875rem;
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.prose h3 {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+.prose h4 {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+.prose h5 {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+.prose h6 {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+/* Paragraphs */
+.prose p {
+  color: #d1d5db;
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+/* Links */
+.prose a {
+  color: #22d3ee;
+  text-decoration: underline;
+  text-decoration-color: #22d3ee;
+  text-decoration-thickness: 2px;
+  transition: all 0.2s ease;
+}
+
+.prose a:hover {
+  color: #67e8f9;
+  text-decoration-color: #67e8f9;
+}
+
+/* Images */
+.prose img {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  transition: all 0.3s ease;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose img:hover {
+  border-color: rgba(34, 211, 238, 0.6);
+}
+
+/* Code blocks */
+.prose code {
+  color: #22d3ee;
+  background-color: rgba(34, 211, 238, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.prose pre {
+  background-color: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #e5e7eb;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  border-left: 4px solid #22d3ee;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  background-color: rgba(34, 211, 238, 0.1);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.prose blockquote p {
+  color: #d1d5db;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Lists */
+.prose ul {
+  color: #d1d5db;
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose ol {
+  color: #d1d5db;
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose li::marker {
+  color: #22d3ee;
+}
+
+/* Tables */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+.prose thead {
+  background-color: rgba(34, 211, 238, 0.1);
+}
+
+.prose th {
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #22d3ee;
+}
+
+.prose td {
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  padding: 0.75rem 1rem;
+  color: #d1d5db;
+}
+
+/* Horizontal rules */
+.prose hr {
+  border: none;
+  border-top: 1px solid rgba(34, 211, 238, 0.3);
+  margin: 2rem 0;
+}
+
+/* Strong emphasis */
+.prose strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Emphasis */
+.prose em {
+  color: #22d3ee;
+}
+
+/* Cyan accent for special elements */
+.prose-cyan {
+  color: #22d3ee;
+}
+
+/* Custom glassmorphism card styles for markdown content */
+.markdown-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
