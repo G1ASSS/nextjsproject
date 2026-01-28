@@ -19,9 +19,13 @@ const translations = {
       contact: 'Contact',
       dailyBlog: 'Daily Learning Blog',
       blogTitle: 'Learning & Sharing',
-      kaliTools: 'Kali Linux Tools',
-      projects: 'Projects'
+      learning: 'Learning & Sharing',
+      projects: 'Projects',
+      kaliTools: 'Kali Linux Tools'
     },
+    learningDescription: 'Explore my latest insights, tutorials, and discoveries in web development, security, and emerging technologies.',
+    kaliDescription: 'Master the art of ethical hacking with my curated list of essential Kali Linux tools for penetration testing and security auditing.',
+    terminalDescription: 'Watch as I scan networks and discover vulnerabilities in real-time.',
     languages: {
       en: 'English',
       my: 'Myanmar',
@@ -32,15 +36,19 @@ const translations = {
   },
   my: {
     nav: {
-      home: 'ပင်မစာမျက်နှာ',
+      home: 'ပင်မ',
       about: 'အကြောင်း',
-      services: 'ဝန်ဆောင်မှုများ',
-      contact: 'ဆက်သွယ်ရန်',
-      dailyBlog: 'နေ့စဉ်လေ့လာရေးဘလော့',
+      services: 'ဝန်ဆောင်မှု',
+      contact: 'ဆက်သွယ်',
+      dailyBlog: 'နေ့စဉ်ဘလော့',
       blogTitle: 'လေ့လာမှုနှင့် မျှဝေမှု',
-      kaliTools: 'Kali Linux ကိရိယာများ',
-      projects: 'စီမံကိန်းများ'
+      learning: 'လေ့လာမှုနှင့် မျှဝေမှု',
+      projects: 'စီမံကိန်းများ',
+      kaliTools: 'Kali ကိရိယာ'
     },
+    learningDescription: 'ဝက်ဘ်ဖွံ့ဖြိုးတိုးတက်မှု၊ လုံခြုံရေးနှင့် ပေါ်ထွက်လာသော နည်းချက်များကို အချိန်နှင့်တပြေးညီ ရှာဖွေဖော်ထုတ်နေမှုကို ကြည့်ရှုပါ။',
+    kaliDescription: 'Penetration testing နှင့် လုံခြုံရေးစစ်ဆေးခြင်းများအတွက် လိုအပ်သော Kali Linux လက်နက်များကို ဤနေရာတွင် လေ့လာနိုင်ပါသည်။',
+    terminalDescription: 'ကွန်ရက်များကို စစ်ဆေးပြီး အားနည်းချက်များကို အချိန်နှင့်တပြေးညီ ရှာဖွေဖော်ထုတ်နေမှုကို ကြည့်ရှုပါ။',
     languages: {
       en: 'English',
       my: 'မြန်မာ',
@@ -55,11 +63,15 @@ const translations = {
       about: 'เกี่ยวกับ',
       services: 'บริการ',
       contact: 'ติดต่อ',
-      dailyBlog: 'บล็อกการเรียนรู้ประจำวัน',
+      dailyBlog: 'บล็อก',
       blogTitle: 'การเรียนรู้และการแชร์',
-      kaliTools: 'เครื่องมือ Kali Linux',
-      projects: 'โครงการ'
+      learning: 'เรียนรู้',
+      projects: 'โครงการ',
+      kaliTools: 'เครื่องมือ Kali'
     },
+    learningDescription: 'สำรวจข้อมูลเชิงลึก บทเรียน และการค้นพบล่าสุดของฉันในการพัฒนาเว็บ ความปลอดภัย และเทคโนโลยีที่กำลังเติบโต',
+    kaliDescription: 'เรียนรู้ศิลปะการเจาะระบบอย่างมีจริยธรรมด้วยเครื่องมือ Kali Linux ที่จำเป็นสำหรับการทดสอบการเจาะระบบ',
+    terminalDescription: 'ดูขณะที่ฉันสแกนเครือข่ายและค้นหาช่องโหว่แบบเรียนไทม์',
     languages: {
       en: 'English',
       my: 'พม่า',
@@ -71,14 +83,18 @@ const translations = {
   es: {
     nav: {
       home: 'Inicio',
-      about: 'Acerca de',
+      about: 'Acerca',
       services: 'Servicios',
       contact: 'Contacto',
-      dailyBlog: 'Blog de Aprendizaje Diario',
-      blogTitle: 'Aprendizaje y Compartir',
-      kaliTools: 'Herramientas de Kali Linux',
-      projects: 'Proyectos'
+      dailyBlog: 'Blog Diario',
+      blogTitle: 'Aprender y Compartir',
+      learning: 'Aprender',
+      projects: 'Proyectos',
+      kaliTools: 'Herramientas Kali'
     },
+    learningDescription: 'Explora mis últimos conocimientos, tutoriales y descubrimientos en desarrollo web, seguridad y tecnologías emergentes.',
+    kaliDescription: 'Domina el arte del hacking ético con mi lista de herramientas esenciales de Kali Linux para pruebas de penetración.',
+    terminalDescription: 'Mira como escaneo redes y descubro vulnerabilidades en tiempo real.',
     languages: {
       en: 'English',
       my: 'Birmania',
@@ -93,11 +109,15 @@ const translations = {
       about: '关于',
       services: '服务',
       contact: '联系',
-      dailyBlog: '每日学习博客',
+      dailyBlog: '博客',
       blogTitle: '学习与分享',
-      kaliTools: 'Kali Linux 工具',
-      projects: '项目'
+      learning: '学习',
+      projects: '项目',
+      kaliTools: 'Kali 工具'
     },
+    learningDescription: '探索我在网页开发、安全和新兴技术方面的最新见解、教程和发现。',
+    kaliDescription: '掌握道德黑客的艺术，使用我精选的Kali Linux基本工具进行渗透测试和安全审计。',
+    terminalDescription: '观看我扫描网络并实时发现漏洞。',
     languages: {
       en: '英语',
       my: '缅甸',

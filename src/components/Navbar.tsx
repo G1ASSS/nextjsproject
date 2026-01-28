@@ -14,6 +14,12 @@ const Navbar = () => {
   const { currentLanguage, setLanguage, t } = useLanguage()
   const pathname = usePathname()
 
+  // Helper function to detect Myanmar text and adjust font size
+  const getTextClassName = (text: string, baseClass: string = '') => {
+    const isMyanmar = /[\u1000-\u109F]/.test(text)
+    return `${baseClass} ${isMyanmar ? 'text-xs' : 'text-sm'}`
+  }
+
   // Scroll lock effect
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -53,7 +59,7 @@ const Navbar = () => {
   // Navigation items with icons
   const navigationItems = [
     { href: '/', label: t('nav.home'), icon: Home },
-    { href: '/blog', label: t('nav.blogTitle'), icon: BookOpen },
+    { href: '/learning', label: t('nav.learning'), icon: BookOpen },
     { href: '/tools', label: t('nav.kaliTools'), icon: Terminal },
     { href: '/projects', label: t('nav.projects'), icon: Briefcase },
     { href: '/about', label: t('nav.about'), icon: User },
@@ -84,74 +90,74 @@ const Navbar = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="hidden md:block"
+            className="hidden md:block flex-1"
           >
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="flex items-center justify-end space-x-1">
               <Link
                 href="/"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-2 py-2 rounded-md font-medium transition-colors whitespace-nowrap max-w-[100px] ${
                   pathname === '/' 
                     ? 'text-cyan-400' 
                     : 'text-white hover:text-blue-300'
                 }`}
               >
-                <Home size={18} />
-                <span>{t('nav.home')}</span>
+                <Home size={16} />
+                <span className={getTextClassName(t('nav.home'), 'truncate')}>{t('nav.home')}</span>
               </Link>
               <Link
-                href="/blog"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === '/blog' 
+                href="/learning"
+                className={`flex items-center gap-2 px-2 py-2 rounded-md font-medium transition-colors whitespace-nowrap max-w-[120px] ${
+                  pathname === '/learning' 
                     ? 'text-cyan-400' 
                     : 'text-white hover:text-blue-300'
                 }`}
               >
-                <BookOpen size={18} />
-                <span>{t('nav.blogTitle')}</span>
+                <BookOpen size={16} />
+                <span className={getTextClassName(t('nav.learning'), 'truncate')}>{t('nav.learning')}</span>
               </Link>
               <Link
                 href="/tools"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-2 py-2 rounded-md font-medium transition-colors whitespace-nowrap max-w-[120px] ${
                   pathname === '/tools' 
                     ? 'text-cyan-400' 
                     : 'text-white hover:text-blue-300'
                 }`}
               >
-                <Terminal size={18} />
-                <span>{t('nav.kaliTools')}</span>
+                <Terminal size={16} />
+                <span className={getTextClassName(t('nav.kaliTools'), 'truncate')}>{t('nav.kaliTools')}</span>
               </Link>
               <Link
                 href="/projects"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-2 py-2 rounded-md font-medium transition-colors whitespace-nowrap max-w-[100px] ${
                   pathname === '/projects' 
                     ? 'text-cyan-400' 
                     : 'text-white hover:text-blue-300'
                 }`}
               >
-                <Briefcase size={18} />
-                <span>{t('nav.projects')}</span>
+                <Briefcase size={16} />
+                <span className={getTextClassName(t('nav.projects'), 'truncate')}>{t('nav.projects')}</span>
               </Link>
               <Link
                 href="/about"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-2 py-2 rounded-md font-medium transition-colors whitespace-nowrap max-w-[100px] ${
                   pathname === '/about' 
                     ? 'text-cyan-400' 
                     : 'text-white hover:text-blue-300'
                 }`}
               >
-                <User size={18} />
-                <span>{t('nav.about')}</span>
+                <User size={16} />
+                <span className={getTextClassName(t('nav.about'), 'truncate')}>{t('nav.about')}</span>
               </Link>
               <Link
                 href="/contact"
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-2 py-2 rounded-md font-medium transition-colors whitespace-nowrap max-w-[100px] ${
                   pathname === '/contact' 
                     ? 'text-cyan-400' 
                     : 'text-white hover:text-blue-300'
                 }`}
               >
-                <Mail size={18} />
-                <span>{t('nav.contact')}</span>
+                <Mail size={16} />
+                <span className={getTextClassName(t('nav.contact'), 'truncate')}>{t('nav.contact')}</span>
               </Link>
 
               {/* Language Switcher */}
@@ -311,14 +317,14 @@ const Navbar = () => {
                         <Link 
                           href={item.href} 
                           onClick={closeMobileMenu} 
-                          className={`flex items-center space-x-3 text-lg font-medium transition-colors leading-relaxed ${
+                          className={`flex items-center space-x-3 font-medium transition-colors leading-relaxed ${
                             isActive 
                               ? 'text-cyan-400' 
                               : 'text-white/90 hover:text-white'
                           }`}
                         >
-                          <Icon className="h-5 w-5" />
-                          <span>{item.label}</span>
+                          <Icon className="h-5 w-5 flex-shrink-0" />
+                          <span className={getTextClassName(item.label, 'truncate')}>{item.label}</span>
                         </Link>
                       </motion.div>
                     )

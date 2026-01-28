@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { Category } from './categories'
 
 // Cache for blog posts to avoid redundant calls
 let blogPostsCache: BlogPost[] | null = null
@@ -112,6 +113,8 @@ export interface BlogPost {
   updated_at?: string
   published?: boolean
   category?: string
+  category_id?: string
+  category_data?: Category
   tags?: string[]
   image_url?: string
 }
@@ -159,10 +162,131 @@ const fallbackBlogPosts: BlogPost[] = [
   }
 ]
 
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export async function getBlogPostsByCategoryId(categoryId: string): Promise<BlogPost[]> {
+  try {
+    console.log('=== getBlogPostsByCategoryId START ===')
+    console.log('Fetching blog posts by category ID:', categoryId)
+    console.log('Category ID type:', typeof categoryId)
+    console.log('Category ID length:', categoryId?.length)
+    console.log('Supabase client available:', !!supabase)
+    
+    if (!categoryId) {
+      console.error('Category ID is null or undefined')
+      return []
+    }
+    
+    if (!supabase) {
+      console.error('Supabase client is not available')
+      return []
+    }
+    
+    console.log('Executing Supabase query...')
+    const query = supabase
+      .from('blogs')
+      .select('*')
+      .eq('category_id', categoryId)
+      .order('created_at', { ascending: false })
+    
+    console.log('Query object:', query)
+    
+    const { data, error, status } = await query
+
+    console.log('=== RAW SUPABASE RESPONSE ===')
+    console.log('Data:', data)
+    console.log('Error:', error)
+    console.log('Status:', status)
+    console.log('Data type:', typeof data)
+    console.log('Error type:', typeof error)
+    console.log('Status type:', typeof status)
+    console.log('Data is null:', data === null)
+    console.log('Error is null:', error === null)
+    console.log('Error is undefined:', error === undefined)
+    console.log('Error constructor:', error?.constructor?.name)
+    console.log('Error keys:', error ? Object.keys(error) : 'No keys')
+    
+    // Stringify for inspection
+    try {
+      console.log('Error stringified:', JSON.stringify(error, null, 2))
+    } catch (e) {
+      console.log('Could not stringify error:', e)
+    }
+
+    console.log('Supabase response for category posts:', { 
+      data, 
+      error, 
+      status,
+      dataType: typeof data,
+      errorType: typeof error,
+      dataLength: data?.length,
+      errorMessage: error?.message,
+      errorDetails: error?.details,
+      hint: error?.hint,
+      code: error?.code
+    })
+
+    if (error) {
+      console.error('=== ERROR DETECTED ===')
+      console.error('Error fetching blog posts by category ID:', {
+        message: error.message || 'No message',
+        details: error.details || 'No details',
+        hint: error.hint || 'No hint',
+        code: error.code || 'No code',
+        status: status || 'No status'
+      })
+      
+      // Try to fetch all posts to see if the issue is with the filter
+      console.log('Attempting to fetch all posts to diagnose the issue...')
+      const { data: allPostsData, error: allPostsError } = await supabase
+        .from('blogs')
+        .select('*')
+        .limit(5)
+      
+      console.log('All posts diagnostic result:', {
+        data: allPostsData,
+        error: allPostsError,
+        count: allPostsData?.length
+      })
+      
+      // If category_id doesn't work, try fallback with string matching
+      console.log('Category ID query failed, trying fallback logic...')
+      const allPosts = await getBlogPosts()
+      console.log('All posts from getBlogPosts:', allPosts.length)
+      
+      const filteredPosts = allPosts.filter(post => {
+        console.log('Checking post:', post.id, 'category_id:', post.category_id, 'target:', categoryId)
+        return post.category_id === categoryId
+      })
+      
+      console.log('Filtered posts count:', filteredPosts.length)
+      return filteredPosts
+    }
+
+    console.log('Successfully fetched blog posts by category ID:', data?.length || 0)
+    console.log('Posts data by category ID:', data)
+    return data || []
+  } catch (error) {
+    console.error('=== CATCH BLOCK ERROR ===')
+    console.error('Error fetching blog posts by category ID:', error)
+    console.error('Error type:', typeof error)
+    console.error('Error constructor:', error?.constructor?.name)
+    console.error('Error keys:', error ? Object.keys(error) : 'No keys')
+    
+    try {
+      console.error('Error stringified:', JSON.stringify(error, null, 2))
+    } catch (e) {
+      console.error('Could not stringify error:', e)
+    }
+    
+    console.error('Error message:', error && typeof error === 'object' && 'message' in error ? error.message : 'No message')
+    console.error('Error stack:', error && typeof error === 'object' && 'stack' in error ? error.stack : 'No stack')
+    return []
+  }
+}
+
+export async function getBlogPosts(categorySlug?: string): Promise<BlogPost[]> {
   // Check cache first
   const now = Date.now()
-  if (blogPostsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+  if (blogPostsCache && (now - cacheTimestamp) < CACHE_DURATION && !categorySlug) {
     console.log('Returning cached blog posts')
     return blogPostsCache
   }
@@ -170,10 +294,18 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
     console.log('Fetching blog posts from Supabase...')
     
-    const { data, error, status } = await supabase
+    // First try a simple query without category join
+    let query = supabase
       .from('blogs')
       .select('*')
       .eq('published', true)
+
+    // Add category filter if provided (using string matching for now)
+    if (categorySlug) {
+      query = query.eq('category', categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1))
+    }
+
+    const { data, error, status } = await query
       .order('created_at', { ascending: false })
 
     console.log('Supabase response:', { data, error, status })
@@ -194,16 +326,25 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         return fallbackBlogPosts
       }
       
-      return []
+      console.log('Using fallback data due to error...')
+      return fallbackBlogPosts
     }
 
     console.log('Successfully fetched blog posts:', data?.length || 0)
     
-    // Update cache
-    blogPostsCache = data || []
-    cacheTimestamp = now
+    // Process the data (no category join for now)
+    const processedData = (data || []).map(post => ({
+      ...post,
+      category_data: null // No category data for now
+    }))
     
-    return blogPostsCache
+    // Update cache (only if not filtered)
+    if (!categorySlug) {
+      blogPostsCache = processedData
+      cacheTimestamp = now
+    }
+    
+    return processedData
   } catch (error) {
     console.error('Unexpected error fetching blog posts:', error)
     console.log('Using fallback data...')

@@ -2,11 +2,14 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import MarkdownRenderer from './MarkdownRenderer'
+import { CategoryBadge } from './CategoryFilter'
+import { Category } from '@/lib/categories'
 
 interface BlogCardProps {
   title: string
   description: string
   category?: string
+  category_data?: Category | null
   imageUrl?: string
   date?: string
   linkUrl?: string
@@ -17,6 +20,7 @@ export default function BlogCard({
   title,
   description,
   category,
+  category_data,
   imageUrl,
   date,
   linkUrl,
@@ -54,9 +58,13 @@ export default function BlogCard({
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-400">{date}</span>
-          <span className="px-3 py-1 bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs rounded-full font-medium">
-            {category}
-          </span>
+          {category_data ? (
+            <CategoryBadge category={category_data} />
+          ) : category ? (
+            <span className="px-3 py-1 bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs rounded-full font-medium">
+              {category}
+            </span>
+          ) : null}
         </div>
         
         {/* View Details Button - Smart routing based on environment */}

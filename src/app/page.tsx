@@ -323,9 +323,14 @@ export default function Home() {
           viewport={{ once: true, amount: 0.1 }}
           className="mt-20"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-12">
-            {t('techArsenal.blogTitle')}
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              {t('techArsenal.blogTitle')}
+            </h2>
+            <p className="text-gray-400">
+              {t('learningDescription')}
+            </p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {loading ? (
@@ -376,7 +381,7 @@ export default function Home() {
           viewport={{ once: true, amount: 0.1 }}
           className="flex justify-center mt-10 mb-16"
         >
-          <Link href="/blog" className="block">
+          <Link href="/learning" className="block">
             <motion.button
               whileHover={{ 
                 scale: 1.05,
@@ -402,6 +407,9 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-12">
             {t('learningLog.title')}
           </h2>
+          <p className="text-gray-400 text-center max-w-3xl mx-auto mb-12">
+            {t('kaliDescription')}
+          </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {loading ? (
@@ -559,7 +567,7 @@ export default function Home() {
               {t('hero.terminalTitle')}
             </h2>
             <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-              Watch as I scan networks and discover vulnerabilities in real-time
+              {t('terminalDescription')}
             </p>
           </div>
           <Terminal />

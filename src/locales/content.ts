@@ -8,8 +8,13 @@ export const websiteContent = {
       contact: 'Contact',
       dailyBlog: 'Daily Learning Blog',
       blogTitle: 'Learning & Sharing',
+      learning: 'Learning & Sharing',
+      projects: 'Projects',
       kaliTools: 'Kali Linux Tools'
     },
+    learningDescription: 'Explore my latest insights, tutorials, and discoveries in web development, security, and emerging technologies.',
+    kaliDescription: 'Master the art of ethical hacking with my curated list of essential Kali Linux tools for penetration testing and security auditing.',
+    terminalDescription: 'Watch as I scan networks and discover vulnerabilities in real-time.',
     // Hero Section
     hero: {
       welcome: 'Welcome to',
@@ -126,8 +131,13 @@ export const websiteContent = {
       contact: 'ဆက်သွယ်ရန်',
       dailyBlog: 'နေ့စဉ်လေ့လာရေးဘလော့',
       blogTitle: 'လေ့လာမှုနှင့် မျှဝေမှု',
+      learning: 'လေ့လာမှုနှင့် မျှဝေမှု',
+      projects: 'ပရောဂျက်များ',
       kaliTools: 'Kali Linux ကိရိယာများ'
     },
+    learningDescription: 'ဝက်ဘ်ဖွံ့ဖြိုးတိုးတက်မှု၊ လုံခြုံရေးနှင့် ပေါ်ထွက်လာသော နည်းပညာများဆိုင်ရာ ကျွန်ုပ်၏ နောက်ဆုံးရ ထိုးထွင်းသိမြင်မှုများနှင့် သင်ခန်းစာများကို လေ့လာပါ။',
+    kaliDescription: 'Penetration testing နှင့် လုံခြုံရေးစစ်ဆေးခြင်းများအတွက် လိုအပ်သော Kali Linux လက်နက်များကို ဤနေရာတွင် လေ့လာနိုင်ပါသည်။',
+    terminalDescription: 'ကွန်ရက်များကို စစ်ဆေးပြီး အားနည်းချက်များကို အချိန်နှင့်တပြေးညီ ရှာဖွေဖော်ထုတ်နေမှုကို ကြည့်ရှုပါ။',
     hero: {
       welcome: 'မှ ကြိုဆိုပါတယ်',
       brand: 'G1ASS',
@@ -209,8 +219,13 @@ export const websiteContent = {
       contact: 'ติดต่อ',
       dailyBlog: 'บล็อกการเรียนรู้ประจำวัน',
       blogTitle: 'การเรียนรู้และการแชร์',
+      learning: 'การเรียนรู้และการแชร์',
+      projects: 'โปรเจกต์',
       kaliTools: 'เครื่องมือ Kali Linux'
     },
+    learningDescription: 'สำรวจข้อมูลเชิงลึก บทเรียน และการค้นพบล่าสุดของฉันในการพัฒนาเว็บ ความปลอดภัย และเทคโนโลยีที่กำลังเติบโต',
+    kaliDescription: 'เรียนรู้ศิลปะการเจาะระบบอย่างมีจริยธรรมด้วยเครื่องมือ Kali Linux ที่จำเป็นสำหรับการทดสอบการเจาะระบบ',
+    terminalDescription: 'ดูขณะที่ฉันสแกนเครือข่ายและค้นหาช่องโหว่แบบเรียลไทม์',
     hero: {
       welcome: 'ยินดีต้อนรับสู่',
       brand: 'G1ASS',
@@ -292,8 +307,13 @@ export const websiteContent = {
       contact: 'Contacto',
       dailyBlog: 'Blog de Aprendizaje Diario',
       blogTitle: 'Aprendizaje y Compartir',
+      learning: 'Aprendizaje y Compartir',
+      projects: 'Proyectos',
       kaliTools: 'Herramientas de Kali Linux'
     },
+    learningDescription: 'Explora mis últimos conocimientos, tutoriales y descubrimientos en desarrollo web, seguridad y tecnologías emergentes.',
+    kaliDescription: 'Domina el arte del hacking ético con mi lista de herramientas esenciales de Kali Linux para pruebas de penetración.',
+    terminalDescription: 'Mira como escaneo redes y descubro vulnerabilidades en tiempo real.',
     hero: {
       welcome: 'Bienvenido a',
       brand: 'G1ASS',
@@ -375,8 +395,13 @@ export const websiteContent = {
       contact: '联系',
       dailyBlog: '每日学习博客',
       blogTitle: '学习与分享',
+      learning: '学习与分享',
+      projects: '项目',
       kaliTools: 'Kali Linux 工具'
     },
+    learningDescription: '探索我在网页开发、安全和新兴技术方面的最新见解、教程和发现。',
+    kaliDescription: '掌握道德黑客的艺术，使用我精选的Kali Linux基本工具进行渗透测试和安全审计。',
+    terminalDescription: '观看我扫描网络并实时发现漏洞。',
     hero: {
       welcome: '欢迎来到',
       brand: 'G1ASS',
