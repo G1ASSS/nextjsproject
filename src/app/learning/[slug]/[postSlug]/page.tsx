@@ -14,25 +14,47 @@ interface BlogPostPageProps {
 // Generate static params for all blog posts
 export async function generateStaticParams() {
   try {
-    // Fetch all blog posts and their joined categories
-    const { data: posts, error } = await supabase
-      .from('blogs')
-      .select(`
-        slug,
-        categories!inner(slug)
-      `)
-      .eq('status', 'published')
+    // First, get all categories
+    const { data: categories, error: categoriesError } = await supabase
+      .from('categories')
+      .select('id, slug')
 
-    if (error || !posts) {
-      console.error('Error fetching posts for static params:', error)
+    if (categoriesError || !categories) {
+      console.error('Error fetching categories for static params:', categoriesError)
       return []
     }
 
-    // Return them precisely as specified
-    return posts.map((post: any) => ({ 
-      slug: post.categories.slug, 
-      postSlug: post.slug 
-    }));
+    console.log('Found categories:', categories)
+
+    // Then, for each category, get all blog posts
+    const allParams: Array<{ slug: string; postSlug: string }> = []
+
+    for (const category of categories) {
+      const { data: posts, error: postsError } = await supabase
+        .from('blogs')
+        .select('slug')
+        .eq('category_id', category.id)
+        .eq('status', 'published')
+
+      if (postsError) {
+        console.error(`Error fetching posts for category ${category.slug}:`, postsError)
+        continue
+      }
+
+      if (posts && posts.length > 0) {
+        console.log(`Found ${posts.length} posts for category ${category.slug}`)
+        const categoryParams = posts.map((post: any) => ({
+          slug: category.slug,
+          postSlug: post.slug
+        }))
+        allParams.push(...categoryParams)
+      }
+    }
+
+    console.log('Total static params generated:', allParams.length)
+    console.log('Static params:', allParams)
+
+    return allParams
   } catch (error) {
     console.error('Error in generateStaticParams:', error)
     return []
