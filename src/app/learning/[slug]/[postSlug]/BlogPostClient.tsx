@@ -19,20 +19,18 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
   const { currentLanguage } = useLanguage()
   const [currentPost, setCurrentPost] = useState(post)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Debug: Log initial language
-  console.log('=== BLOG POST CLIENT INIT ===')
-  console.log('Initial currentLanguage:', currentLanguage)
-  console.log('Initial post language:', post.language)
-  console.log('Initial post title:', post.title)
-
-  // Test if JavaScript is working at all
-  console.log('JavaScript is working! Component loaded.')
-
-  // Add window.onload test
-  if (typeof window !== 'undefined') {
+  // Handle hydration
+  useEffect(() => {
+    setMounted(true)
+    console.log('=== BLOG POST CLIENT INIT ===')
+    console.log('Initial currentLanguage:', currentLanguage)
+    console.log('Initial post language:', post.language)
+    console.log('Initial post title:', post.title)
+    console.log('JavaScript is working! Component loaded.')
     console.log('Window object is available - client-side rendering is working')
-  }
+  }, [currentLanguage, post.language, post.title])
 
   // Fetch post in the current language when language changes
   useEffect(() => {
@@ -80,15 +78,12 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
   }, [currentLanguage, post.slug, post])
 
   // Check for Null Data
-  if (!currentPost) {
+  if (!currentPost || !mounted) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-cyan-400 mb-4">Post Not Found</h1>
-          <p className="text-gray-400">The blog post you're looking for doesn't exist.</p>
-          <Link href="/learning" className="text-cyan-300 hover:text-white mt-4 inline-block">
-            ← Back to Learning
-          </Link>
+          <h1 className="text-2xl font-bold text-cyan-400 mb-4">Loading...</h1>
+          <p className="text-gray-400">Please wait while we load the content.</p>
         </div>
       </div>
     )

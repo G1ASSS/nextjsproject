@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import BlogPostClient from './BlogPostClient'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -119,10 +120,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // Awaited params at the start of the component
   const { slug, postSlug } = await params
   
+  // Environment variable validation
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase environment variables')
+    notFound()
+  }
+  
   // Clean logs for debugging
   console.log('=== BLOG POST PAGE DEBUG ===')
   console.log('Requested slug:', slug)
   console.log('Requested postSlug:', postSlug)
+  console.log('Supabase URL:', supabaseUrl)
   console.log('Both params received successfully')
   
   try {
@@ -200,7 +211,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
     // Wrap content rendering in Try-Catch block
     try {
-      return <BlogPostClient post={transformedPost} category={postData.categories} />
+      return (
+        <ErrorBoundary>
+          <BlogPostClient post={transformedPost} category={postData.categories} />
+        </ErrorBoundary>
+      )
     } catch (renderError) {
       console.error('Error rendering BlogPostClient:', renderError)
       notFound()
