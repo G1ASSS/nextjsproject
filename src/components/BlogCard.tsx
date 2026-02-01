@@ -82,8 +82,8 @@ export default function BlogCard({
                 </motion.button>
               </Link>
             ) : (
-              // Production - redirect dynamic routes to Vercel
-              (linkUrl.includes('/blog/') || linkUrl.includes('/projects/') || linkUrl.includes('/tools/')) ? (
+              // Production - redirect dynamic routes to Vercel (excluding learning routes)
+              (linkUrl.includes('/projects/') || linkUrl.includes('/tools/')) ? (
                 <a 
                   href={`https://g1ass.vercel.app${linkUrl}`}
                   target="_blank"

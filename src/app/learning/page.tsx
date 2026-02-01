@@ -26,12 +26,29 @@ const getCategoryIcon = (slug: string) => {
 }
 
 export default function LearningPage() {
-  const { t } = useLanguage()
+  const { t, currentLanguage } = useLanguage()
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesWithCounts, setCategoriesWithCounts] = useState<Array<{category: Category, count: number}>>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredCategories, setFilteredCategories] = useState<Array<{category: Category, count: number}>>([])
+
+  // Helper function to render localized title with styled "Sharing" part
+  const renderLearningTitle = () => {
+    if (currentLanguage === 'en') {
+      return (
+        <>
+          {t('learning_title_part1')} <span className="text-cyan-400">{t('learning_title_part2')}</span>
+        </>
+      )
+    } else {
+      return (
+        <>
+          {t('learning_title_part1')} <span className="text-cyan-400">{t('learning_title_part2')}</span>
+        </>
+      )
+    }
+  }
 
   // Fetch categories and post counts
   useEffect(() => {
@@ -71,20 +88,58 @@ export default function LearningPage() {
           const allPosts = await getBlogPosts()
           console.log('Blog posts fetched:', allPosts.length)
           
+          // Get current language from LanguageContext
+          const currentLang = typeof window !== 'undefined' 
+            ? localStorage.getItem('language') || 'en'
+            : 'en';
+          
+          console.log('Current language for counting:', currentLang)
+          
+          // Filter posts by current language
+          const postsInCurrentLang = allPosts.filter(post => post.language === currentLang)
+          console.log('Posts in current language:', postsInCurrentLang.length)
+          
+          // Debug: Show sample post structure
+          if (postsInCurrentLang.length > 0) {
+            console.log('Sample post structure:', postsInCurrentLang[0])
+            console.log('Sample post category_data:', postsInCurrentLang[0].category_data)
+            console.log('Sample post category:', postsInCurrentLang[0].category)
+            console.log('Sample post category_id:', postsInCurrentLang[0].category_id)
+          }
+          
           // Count posts per category
           const categoryCounts = categoriesData.map(category => {
-            const count = allPosts.filter(post => {
-              if (post.category_data) {
-                return post.category_data.slug === category.slug
+            console.log('Counting posts for category:', category.slug, category.name)
+            
+            const count = postsInCurrentLang.filter(post => {
+              console.log('Checking post:', post.title, 'against category:', category.slug)
+              
+              // Try multiple matching strategies
+              if (post.category_data && post.category_data.slug === category.slug) {
+                console.log('Match found via category_data.slug')
+                return true
               }
-              return post && post.category && post.category.toLowerCase() === category.name.toLowerCase()
+              
+              if (post.category && post.category.toLowerCase() === category.name.toLowerCase()) {
+                console.log('Match found via category name')
+                return true
+              }
+              
+              if (post.category_id && post.category_id === category.id) {
+                console.log('Match found via category_id')
+                return true
+              }
+              
+              return false
             }).length
             
+            console.log('Final count for', category.name, ':', count)
             return { category, count }
           })
           
           setCategoriesWithCounts(categoryCounts)
           console.log('Category counts calculated:', categoryCounts.length)
+          console.log('Final category counts:', categoryCounts.map(({ category, count }) => ({ name: category.name, count })))
         } catch (postError) {
           console.log('Error fetching posts, using zero counts:', postError)
           // Set zero counts for all categories
@@ -134,7 +189,7 @@ export default function LearningPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Learning & <span className="text-cyan-400">Sharing</span>
+              {renderLearningTitle()}
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               {t('learningDescription')}
@@ -150,7 +205,7 @@ export default function LearningPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search categories..."
+                  placeholder={t('search_placeholder')}
                   className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-full pl-12 pr-12 py-4 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-300"
                 />
                 {searchQuery && (

@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { BlogPost } from '@/lib/blog'
 import { Category } from '@/lib/categories'
+import { useLanguage } from '@/contexts/LanguageContext'
 import BlogCard from '@/components/BlogCard'
-import Link from 'next/link'
 
 interface CategoryPageClientProps {
   blogPosts: BlogPost[]
@@ -42,6 +44,37 @@ export default function CategoryPageClient({
   blogPosts, 
   category 
 }: CategoryPageClientProps) {
+  const { t, currentLanguage } = useLanguage()
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Get localized category description with dynamic variables
+  const getCategoryDescription = () => {
+    const count = blogPosts.length
+    const name = category?.name || 'Category'
+    
+    if (currentLanguage === 'en') {
+      // English has singular/plural forms
+      const template = count === 1 
+        ? t('categoryDescription.single', { defaultValue: 'Explore {count} post about {name}. Discover tutorials, insights, and best practices in this area.' })
+        : t('categoryDescription.plural', { defaultValue: 'Explore {count} posts about {name}. Discover tutorials, insights, and best practices in this area.' })
+      return template.replace('{count}', count.toString()).replace('{name}', name)
+    } else {
+      // Other languages: try singular/plural first, then fallback to string
+      const singularTemplate = t('categoryDescription.single', { defaultValue: '' })
+      const pluralTemplate = t('categoryDescription.plural', { defaultValue: '' })
+      
+      if (singularTemplate && pluralTemplate) {
+        // Use object structure
+        const template = count === 1 ? singularTemplate : pluralTemplate
+        return template.replace('{count}', count.toString()).replace('{name}', name)
+      } else {
+        // Fallback to string template
+        const template = t('categoryDescription', { defaultValue: '{name} နှင့်ပတ်သက်သော သင်ခန်းစာ {count} ခုကို လေ့လာပါ။ ဤကဏ္ဍတွင် နည်းပညာအသစ်များနှင့် ကောင်းမွန်သော လုပ်ဆောင်ချက်များကို ရှာဖွေနိုင်ပါသည်။' })
+        return template.replace('{count}', count.toString()).replace('{name}', name)
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen">
       {/* Top Navigation Bar */}
@@ -60,7 +93,7 @@ export default function CategoryPageClient({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="text-sm font-medium">Back to All Categories</span>
+              <span className="text-sm font-medium">{t('back_to_learning', { defaultValue: 'Back to Learning' })}</span>
             </Link>
           </div>
         </motion.div>
@@ -80,8 +113,7 @@ export default function CategoryPageClient({
               {category?.name || 'Category'}
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Explore {blogPosts.length} {blogPosts.length === 1 ? 'post' : 'posts'} about {category?.name || 'this category'}.
-              Discover tutorials, insights, and best practices in this area.
+              {getCategoryDescription()}
             </p>
             
             {/* Category Badge */}
@@ -119,7 +151,7 @@ export default function CategoryPageClient({
                     day: 'numeric',
                     year: 'numeric'
                   })}
-                  linkUrl={`/blog/${blog.id}`}
+                  linkUrl={`/learning/${category?.slug || blog.category_data?.slug || 'general'}/${blog.slug}`}
                   linkText="Read More"
                 />
               </motion.div>

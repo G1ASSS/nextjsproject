@@ -7,7 +7,7 @@ export type Language = 'en' | 'my' | 'th' | 'es' | 'zh'
 interface LanguageContextType {
   currentLanguage: Language
   setLanguage: (language: Language) => void
-  t: (key: string) => string
+  t: (key: string, options?: { defaultValue?: string }) => string
 }
 
 const translations = {
@@ -26,6 +26,19 @@ const translations = {
     learningDescription: 'Explore my latest insights, tutorials, and discoveries in web development, security, and emerging technologies.',
     kaliDescription: 'Master the art of ethical hacking with my curated list of essential Kali Linux tools for penetration testing and security auditing.',
     terminalDescription: 'Watch as I scan networks and discover vulnerabilities in real-time.',
+    learning_title: 'Learning & Sharing',
+    learning_title_part1: 'Learning &',
+    learning_title_part2: 'Sharing',
+    search_placeholder: 'Search categories...',
+    back_to_learning: 'Back to Learning',
+    explore_desc: {
+      single: 'Explore {count} post about {name}. Discover tutorials, insights, and best practices.',
+      plural: 'Explore {count} posts about {name}. Discover tutorials, insights, and best practices.'
+    },
+    categoryDescription: {
+      single: 'Explore {count} post about {name}. Discover tutorials, insights, and best practices in this area.',
+      plural: 'Explore {count} posts about {name}. Discover tutorials, insights, and best practices in this area.'
+    },
     languages: {
       en: 'English',
       my: 'Myanmar',
@@ -49,6 +62,13 @@ const translations = {
     learningDescription: 'ဝက်ဘ်ဖွံ့ဖြိုးတိုးတက်မှု၊ လုံခြုံရေးနှင့် ပေါ်ထွက်လာသော နည်းချက်များကို အချိန်နှင့်တပြေးညီ ရှာဖွေဖော်ထုတ်နေမှုကို ကြည့်ရှုပါ။',
     kaliDescription: 'Penetration testing နှင့် လုံခြုံရေးစစ်ဆေးခြင်းများအတွက် လိုအပ်သော Kali Linux လက်နက်များကို ဤနေရာတွင် လေ့လာနိုင်ပါသည်။',
     terminalDescription: 'ကွန်ရက်များကို စစ်ဆေးပြီး အားနည်းချက်များကို အချိန်နှင့်တပြေးညီ ရှာဖွေဖော်ထုတ်နေမှုကို ကြည့်ရှုပါ။',
+    learning_title: 'လေ့လာမှုနှင့် မျှဝေခြင်း',
+    learning_title_part1: 'လေ့လာမှုနှင့်',
+    learning_title_part2: 'မျှဝေခြင်း',
+    search_placeholder: 'အမျိုးအစားများကို ရှာဖွေပါ...',
+    back_to_learning: 'လေ့လာမှုသို့ ပြန်သွားရန်',
+    explore_desc: '{name} နှင့်ပတ်သက်သော သင်ခန်းစာ {count} ခုကို လေ့လာပါ။ နည်းပညာနှင့် အကောင်းအထောက်အပံ့များကို ရှာဖွေနိုင်ပါသည်။',
+    categoryDescription: '{name} နှင့်ပတ်သက်သော သင်ခန်းစာ {count} ခုကို လေ့လာပါ။ ဤကဏ္ဍတွင် နည်းပညာအသစ်များနှင့် ကောင်းမွန်သော လုပ်ဆောင်ချက်များကို ရှာဖွေနိုင်ပါသည်။',
     languages: {
       en: 'English',
       my: 'မြန်မာ',
@@ -71,7 +91,20 @@ const translations = {
     },
     learningDescription: 'สำรวจข้อมูลเชิงลึก บทเรียน และการค้นพบล่าสุดของฉันในการพัฒนาเว็บ ความปลอดภัย และเทคโนโลยีที่กำลังเติบโต',
     kaliDescription: 'เรียนรู้ศิลปะการเจาะระบบอย่างมีจริยธรรมด้วยเครื่องมือ Kali Linux ที่จำเป็นสำหรับการทดสอบการเจาะระบบ',
-    terminalDescription: 'ดูขณะที่ฉันสแกนเครือข่ายและค้นหาช่องโหว่แบบเรียนไทม์',
+    terminalDescription: 'ดูขณะที่ฉันสแกนเครือข่ายและค้นหาช่องโหว่แบบเรียลไทม์',
+    learning_title: 'การเรียนรู้และการแบ่งปัน',
+    learning_title_part1: 'การเรียนรู้ &',
+    learning_title_part2: 'การแบ่งปัน',
+    search_placeholder: 'ค้นหาหมวดหมู่...',
+    back_to_learning: 'กลับไปที่การเรียนรู้',
+    explore_desc: {
+      single: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุด',
+      plural: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุด'
+    },
+    categoryDescription: {
+      single: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุดในด้านนี้',
+      plural: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุดในด้านนี้'
+    },
     languages: {
       en: 'English',
       my: 'พม่า',
@@ -95,6 +128,19 @@ const translations = {
     learningDescription: 'Explora mis últimos conocimientos, tutoriales y descubrimientos en desarrollo web, seguridad y tecnologías emergentes.',
     kaliDescription: 'Domina el arte del hacking ético con mi lista de herramientas esenciales de Kali Linux para pruebas de penetración.',
     terminalDescription: 'Mira como escaneo redes y descubro vulnerabilidades en tiempo real.',
+    learning_title: 'Aprender y Compartir',
+    learning_title_part1: 'Aprender &',
+    learning_title_part2: 'Compartir',
+    search_placeholder: 'Buscar categorías...',
+    back_to_learning: 'Volver al Aprendizaje',
+    explore_desc: {
+      single: 'Explora {count} publicación sobre {name}. Descubre tutoriales, ideas y mejores prácticas.',
+      plural: 'Explora {count} publicaciones sobre {name}. Descubre tutoriales, ideas y mejores prácticas.'
+    },
+    categoryDescription: {
+      single: 'Explora {count} publicación sobre {name}. Descubre tutoriales, ideas y mejores prácticas en esta área.',
+      plural: 'Explora {count} publicaciones sobre {name}. Descubre tutoriales, ideas y mejores prácticas en esta área.'
+    },
     languages: {
       en: 'English',
       my: 'Birmania',
@@ -109,7 +155,7 @@ const translations = {
       about: '关于',
       services: '服务',
       contact: '联系',
-      dailyBlog: '博客',
+      dailyBlog: '每日博客',
       blogTitle: '学习与分享',
       learning: '学习',
       projects: '项目',
@@ -118,6 +164,19 @@ const translations = {
     learningDescription: '探索我在网页开发、安全和新兴技术方面的最新见解、教程和发现。',
     kaliDescription: '掌握道德黑客的艺术，使用我精选的Kali Linux基本工具进行渗透测试和安全审计。',
     terminalDescription: '观看我扫描网络并实时发现漏洞。',
+    learning_title: '学习与分享',
+    learning_title_part1: '学习 &',
+    learning_title_part2: '分享',
+    search_placeholder: '搜索分类...',
+    back_to_learning: '返回学习',
+    explore_desc: {
+      single: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。',
+      plural: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。'
+    },
+    categoryDescription: {
+      single: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。',
+      plural: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。'
+    },
     languages: {
       en: '英语',
       my: '缅甸',
@@ -149,7 +208,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
     setCurrentLanguage(language)
   }
 
-  const t = (key: string): string => {
+  const t = (key: string, options?: { defaultValue?: string }): string => {
     const keys = key.split('.')
     let value: any = translations[currentLanguage]
     
@@ -157,7 +216,22 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       value = value?.[k]
     }
     
-    return value || key
+    // If translation not found in current language, fallback to English
+    if (value === undefined || value === null) {
+      let fallbackValue: any = translations['en']
+      for (const k of keys) {
+        fallbackValue = fallbackValue?.[k]
+      }
+      
+      // If English fallback also not found, use defaultValue or return the key
+      if (fallbackValue === undefined || fallbackValue === null) {
+        return options?.defaultValue || key
+      }
+      
+      return fallbackValue
+    }
+    
+    return value || options?.defaultValue || key
   }
 
   return (

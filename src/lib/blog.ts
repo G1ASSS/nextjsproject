@@ -105,6 +105,7 @@ export async function testSupabaseConnection(): Promise<boolean> {
 export interface BlogPost {
   id: string
   title: string
+  slug: string
   description: string
   content: string
   excerpt?: string
@@ -117,47 +118,52 @@ export interface BlogPost {
   category_data?: Category
   tags?: string[]
   image_url?: string
+  video_url?: string
+  language?: string
 }
 
 // Fallback blog data for when Supabase is not available
 const fallbackBlogPosts: BlogPost[] = [
   {
     id: 'fallback-1',
+    slug: 'advanced-kali-linux-security',
     title: 'Advanced Kali Linux Security Techniques',
     description: 'Master advanced penetration testing tools and techniques for ethical hacking and security auditing.',
     content: 'In this comprehensive guide, we explore advanced penetration testing methodologies using Kali Linux.',
     excerpt: 'Master advanced penetration testing tools and techniques for ethical hacking and security auditing.',
-    author: 'G1ASS Security Team',
-    created_at: new Date().toISOString(),
+    author: 'G1ASS',
+    created_at: '2024-01-15T10:00:00Z',
     category: 'Security',
-    tags: ['Security', 'Penetration Testing', 'Ethical Hacking'],
+    tags: ['kali-linux', 'penetration-testing', 'security'],
     image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726a?w=400&h=200&fit=crop&crop=center',
     published: true
   },
   {
     id: 'fallback-2',
-    title: 'Next.js 14 Performance Optimization Guide',
-    description: 'Build high-performance web applications with Next.js 14, server components, and advanced optimization strategies.',
-    content: 'Building lightning-fast web applications requires understanding the intricacies of Next.js 14.',
-    excerpt: 'Build high-performance web applications with Next.js 14, server components, and advanced optimization strategies.',
-    author: 'G1ASS Development Team',
-    created_at: new Date().toISOString(),
-    category: 'Web Development',
-    tags: ['Web Development', 'React', 'Next.js', 'Performance'],
-    image_url: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=200&fit=crop&crop=center',
+    slug: 'modern-html5-features',
+    title: 'Modern HTML5 Features and Best Practices',
+    description: 'Explore the latest HTML5 features including semantic elements, multimedia support, and powerful APIs.',
+    content: 'HTML5 has revolutionized web development with semantic elements, multimedia support, and powerful APIs.',
+    excerpt: 'Explore the latest HTML5 features including semantic elements, multimedia support, and powerful APIs.',
+    author: 'G1ASS',
+    created_at: '2024-01-10T14:30:00Z',
+    category: 'HTML',
+    tags: ['html5', 'web-development', 'frontend'],
+    image_url: 'https://images.unsplash.com/photo-1627398242455-45a1465c2479?w=400&h=200&fit=crop&crop=center',
     published: true
   },
   {
     id: 'fallback-3',
-    title: 'Python for Security Automation',
-    description: 'Automate security workflows with Python - from network scanning to vulnerability assessment.',
-    content: 'Automating security tasks with Python can significantly improve efficiency and accuracy.',
-    excerpt: 'Automate security workflows with Python - from network scanning to vulnerability assessment.',
-    author: 'G1ASS Automation Team',
-    created_at: new Date().toISOString(),
-    category: 'Python',
-    tags: ['Python', 'Automation', 'Security', 'Programming'],
-    image_url: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=200&fit=crop&crop=center',
+    slug: 'nextjs-performance-optimization',
+    title: 'Next.js Performance Optimization Guide',
+    description: 'Learn advanced techniques for optimizing Next.js applications for maximum performance and user experience.',
+    content: 'Next.js provides powerful features for building high-performance web applications.',
+    excerpt: 'Learn advanced techniques for optimizing Next.js applications for maximum performance.',
+    author: 'G1ASS',
+    created_at: '2024-01-05T09:15:00Z',
+    category: 'Next.js',
+    tags: ['nextjs', 'performance', 'optimization'],
+    image_url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop&crop=center',
     published: true
   }
 ]
@@ -294,15 +300,18 @@ export async function getBlogPosts(categorySlug?: string): Promise<BlogPost[]> {
   try {
     console.log('Fetching blog posts from Supabase...')
     
-    // First try a simple query without category join
+    // Updated query for new table structure with category join
     let query = supabase
       .from('blogs')
-      .select('*')
-      .eq('published', true)
+      .select(`
+        *,
+        categories(id, name, slug)
+      `)
+      .eq('status', 'published')
 
-    // Add category filter if provided (using string matching for now)
+    // Add category filter if provided (using slug from categories table)
     if (categorySlug) {
-      query = query.eq('category', categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1))
+      query = query.eq('categories.slug', categorySlug)
     }
 
     const { data, error, status } = await query
@@ -330,24 +339,45 @@ export async function getBlogPosts(categorySlug?: string): Promise<BlogPost[]> {
       return fallbackBlogPosts
     }
 
-    console.log('Successfully fetched blog posts:', data?.length || 0)
-    
-    // Process the data (no category join for now)
-    const processedData = (data || []).map(post => ({
-      ...post,
-      category_data: null // No category data for now
+    if (!data || data.length === 0) {
+      console.log('No blog posts found')
+      return []
+    }
+
+    console.log(`Successfully fetched ${data.length} blog posts`)
+
+    // Transform the data to match BlogPost interface
+    const transformedPosts: BlogPost[] = data.map((post: any) => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      description: post.description || '',
+      content: post.content || '',
+      excerpt: post.description || '',
+      author: post.author_name || 'G1ASS',
+      created_at: post.created_at,
+      updated_at: post.updated_at,
+      published: post.status === 'published',
+      category: post.categories?.name || '',
+      category_id: post.category_id,
+      category_data: post.categories || null,
+      tags: [],
+      image_url: post.image_url,
+      video_url: post.video_url,
+      language: post.language || 'en'
     }))
-    
-    // Update cache (only if not filtered)
+
+    // Cache the results if no category filter
     if (!categorySlug) {
-      blogPostsCache = processedData
+      blogPostsCache = transformedPosts
       cacheTimestamp = now
     }
-    
-    return processedData
+
+    return transformedPosts
   } catch (error) {
-    console.error('Unexpected error fetching blog posts:', error)
-    console.log('Using fallback data...')
+    console.error('Unexpected error in getBlogPosts:', error)
+    console.error('Error message:', error && typeof error === 'object' && 'message' in error ? error.message : 'No message')
+    console.error('Error stack:', error && typeof error === 'object' && 'stack' in error ? error.stack : 'No stack')
     return fallbackBlogPosts
   }
 }

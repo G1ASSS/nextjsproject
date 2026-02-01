@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getToolById, Tool } from '@/lib/tools'
+import { getToolById, Tool, getTools } from '@/lib/tools'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 
 interface ToolPageProps {
@@ -10,6 +10,33 @@ interface ToolPageProps {
     id: string
   }>
 }
+
+// Generate static params for all tools
+export async function generateStaticParams() {
+  try {
+    console.log('Generating static params for tools...')
+    
+    const tools = await getTools()
+    
+    if (!tools || tools.length === 0) {
+      console.log('No tools found for static params')
+      return []
+    }
+
+    const params = tools.map((tool) => ({
+      id: tool.id
+    }))
+
+    console.log(`Generated ${params.length} static params for tools`)
+    return params
+  } catch (error) {
+    console.error('Error in generateStaticParams for tools:', error)
+    return []
+  }
+}
+
+// Force static generation for this page
+export const dynamic = 'force-static'
 
 export async function generateMetadata({ params }: ToolPageProps): Promise<Metadata> {
   try {

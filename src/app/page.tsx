@@ -354,21 +354,27 @@ export default function Home() {
               ))
             ) : (
               // Show actual blog posts
-              blogPosts.slice(0, 3).map((blog) => (
-                <BlogCard
-                  key={blog.id}
-                  title={blog.title}
-                  description={blog.description}
-                  category={blog.category}
-                  imageUrl={blog.image_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726a?w=400&h=200&fit=crop&crop=center'}
-                  date={new Date(blog.created_at).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
-                  linkUrl={`/blog/${blog.id}`}
-                  linkText="View Details"
-                />
-              ))
+              blogPosts.slice(0, 3).map((blog) => {
+                // Get category slug from category_data or fallback to category name
+                const categorySlug = blog.category_data?.slug || 
+                  (blog.category ? blog.category.toLowerCase().replace(/\s+/g, '-') : 'general');
+                
+                return (
+                  <BlogCard
+                    key={blog.id}
+                    title={blog.title}
+                    description={blog.description}
+                    category={blog.category}
+                    imageUrl={blog.image_url || 'https://images.unsplash.com/photo-1550745165-9bc0b252726a?w=400&h=200&fit=crop&crop=center'}
+                    date={new Date(blog.created_at).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                    linkUrl={`/learning/${categorySlug}`}
+                    linkText="View Details"
+                  />
+                );
+              })
             )}
           </div>
         </motion.section>

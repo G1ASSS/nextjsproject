@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getProjectById, Project } from '@/lib/projects'
+import { getProjectById, Project, getProjects } from '@/lib/projects'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 
 interface ProjectPageProps {
@@ -10,6 +10,33 @@ interface ProjectPageProps {
     id: string
   }>
 }
+
+// Generate static params for all projects
+export async function generateStaticParams() {
+  try {
+    console.log('Generating static params for projects...')
+    
+    const projects = await getProjects()
+    
+    if (!projects || projects.length === 0) {
+      console.log('No projects found for static params')
+      return []
+    }
+
+    const params = projects.map((project) => ({
+      id: project.id
+    }))
+
+    console.log(`Generated ${params.length} static params for projects`)
+    return params
+  } catch (error) {
+    console.error('Error in generateStaticParams for projects:', error)
+    return []
+  }
+}
+
+// Force static generation for this page
+export const dynamic = 'force-static'
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   try {
