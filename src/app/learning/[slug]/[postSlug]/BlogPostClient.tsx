@@ -29,6 +29,54 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
   const urlLocale = getLocaleFromPath(pathname)
   const effectiveLocale = currentLanguage || urlLocale || 'en'
 
+  // Client-side fetch to get the latest post data with cache-busting
+  useEffect(() => {
+    const fetchLatestPost = async () => {
+      if (!post?.slug || !mounted) return
+      
+      setLoading(true)
+      try {
+        // Add cache-busting parameters to prevent GitHub Pages caching
+        const cacheBuster = `&_t=${Date.now()}&_r=${Math.random()}`
+        
+        console.log('=== CLIENT-SIDE POST FETCH ===')
+        console.log('Fetching latest post data for:', post.slug)
+        console.log('Effective locale:', effectiveLocale)
+        
+        const { data: latestPost, error } = await supabase
+          .from('blogs')
+          .select(`
+            *,
+            categories(id, name, slug)
+          `)
+          .eq('slug', post.slug)
+          .eq('status', 'published')
+          .single()
+
+        if (latestPost && !error) {
+          console.log('=== POST FETCH SUCCESS ===')
+          console.log('Fetched latest post:', latestPost.title)
+          console.log('Post language:', latestPost.language)
+          console.log('Post updated_at:', latestPost.updated_at)
+          
+          setCurrentPost(latestPost)
+        } else {
+          console.log('=== POST FETCH ERROR ===')
+          console.log('Error:', error)
+          // Keep the original post if fetch fails
+        }
+      } catch (err) {
+        console.error('Error fetching latest post:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    // Set mounted state and fetch latest data
+    setMounted(true)
+    fetchLatestPost()
+  }, [post?.slug, effectiveLocale, mounted])
+
   console.log('=== DYNAMIC BLOG POST CLIENT DEBUG ===')
   console.log('Pathname:', pathname)
   console.log('URL locale:', urlLocale)

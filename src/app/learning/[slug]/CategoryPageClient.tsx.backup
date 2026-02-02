@@ -83,27 +83,27 @@ export default function CategoryPageClient({
   const urlLocale = getLocaleFromPath(pathname)
   const effectiveLocale = currentLanguage || urlLocale || 'en'
   
-  // State for real-time data fetching
+  // Add state for real-time data fetching
   const [posts, setPosts] = useState<BlogPost[]>(blogPosts)
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
-  console.log('=== CLIENT-SIDE CATEGORY FETCH ===')
-  console.log('Category:', category?.name)
-  console.log('Effective locale:', effectiveLocale)
-  console.log('Initial posts count:', blogPosts.length)
+  console.log('=== DYNAMIC CATEGORY CLIENT DEBUG ===')
+  console.log('Pathname:', pathname)
+  console.log('URL locale:', urlLocale)
+  console.log('Current language from context:', currentLanguage)
+  console.log('Effective locale for filtering:', effectiveLocale)
+  console.log('Total posts received from server:', blogPosts.length)
 
-  // Client-side fetch to get latest data from Supabase with cache-busting
+  // Client-side fetch to get latest data from Supabase
   useEffect(() => {
     const fetchLatestPosts = async () => {
       if (!category?.id) return
       
       setIsLoading(true)
       try {
-        // Add cache-busting parameters to prevent GitHub Pages caching
+        // Add cache-busting parameter to prevent GitHub Pages caching
         const cacheBuster = `&_t=${Date.now()}&_r=${Math.random()}`
-        
-        console.log('Fetching latest posts with cache-busting...')
         
         const { data: latestPosts, error } = await supabase
           .from('blogs')
@@ -163,9 +163,10 @@ export default function CategoryPageClient({
     post.category_id === category?.id
   )
 
-  console.log('=== END CLIENT-SIDE CATEGORY FETCH ===')
-  console.log('Final filtered posts count:', filteredPosts.length)
+  console.log('=== END DYNAMIC CATEGORY CLIENT DEBUG ===')
+  console.log('Final posts count:', filteredPosts.length)
   console.log('Is loading:', isLoading)
+  console.log('Is initial load:', isInitialLoad)
 
   // Loading state component
   if (isInitialLoad && isLoading) {
@@ -209,10 +210,64 @@ export default function CategoryPageClient({
 
     fetchLatestPosts()
   }
-
-  // Get count and name for translation
-  const count = filteredPosts.length
+            
+            // Update state with the direct fetch results
+            setFilteredPostsState(myanmarPosts)
+            console.log('Updated filteredPosts length:', myanmarPosts.length)
+          } else {
+            console.log('Direct Myanmar fetch failed:', error)
+          }
+        } catch (err) {
+          console.error('Error in direct Myanmar fetch:', err)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      
+      fetchMyanmarPosts()
+      console.log('=== END MYANMAR HARDCODED FETCH ===')
+    }
+  }, [effectiveLocale, filteredPosts.length, blogPosts, category?.id])
+  
+  console.log('=== FILTERING DEBUG ===')
+  console.log('Filtering for locale:', effectiveLocale)
+  console.log('Filtering for category ID:', category?.id)
+  console.log('Posts that match BOTH language and category:', filteredPosts.map(p => ({ 
+    title: p.title, 
+    language: p.language, 
+    category_id: p.category_id 
+  })))
+  console.log('=== END FILTERING DEBUG ===')
+  
+  // Get count and name for translation - use state for dynamic updates
+  const count = filteredPostsState.length
   const name = category?.name || 'Category'
+  
+  console.log('=== CATEGORY CLIENT DEBUG ===')
+  console.log('Effective locale:', effectiveLocale)
+  console.log('Total posts received:', blogPosts.length)
+  console.log('Filtered posts count:', filteredPosts.length)
+  
+  // Debug logging for all languages
+  console.log('Posts by language:', blogPosts.reduce((acc: Record<string, number>, post) => {
+    const lang = post.language || 'unknown'
+    acc[lang] = (acc[lang] || 0) + 1
+    return acc
+  }, {}))
+  
+  // Specifically check for Myanmar posts (case-insensitive)
+  const myanmarPosts = blogPosts.filter(post => post.language && post.language.toLowerCase() === 'my')
+  console.log('Myanmar posts found (case-insensitive):', myanmarPosts.length)
+  if (myanmarPosts.length > 0) {
+    console.log('Myanmar post details:', myanmarPosts.map(p => ({ 
+      id: p.id, 
+      title: p.title, 
+      language: p.language,
+      category_id: p.category_id,
+      slug: p.slug
+    })))
+  }
+  console.log('=== END CATEGORY CLIENT DEBUG ===')
 
   return (
     <div className="min-h-screen">
@@ -224,7 +279,7 @@ export default function CategoryPageClient({
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <div className="flex justify-between items-center">
+          <div className="flex justify-start items-center">
             <Link
               href="/learning"
               className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-cyan-300 hover:text-white transition-colors border border-cyan-500/30 hover:border-cyan-400/60"
@@ -234,24 +289,6 @@ export default function CategoryPageClient({
               </svg>
               <span className="text-sm font-medium">{t('back_to_learning', { defaultValue: 'Back to Learning' })}</span>
             </Link>
-            
-            {/* Refresh button */}
-            <button
-              onClick={handleRefresh}
-              disabled={isLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-cyan-300 hover:text-white transition-colors border border-cyan-500/30 hover:border-cyan-400/60 disabled:opacity-50"
-            >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-300"></div>
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              )}
-              <span className="text-sm font-medium">
-                {isLoading ? 'Refreshing...' : 'Refresh'}
-              </span>
-            </button>
           </div>
         </motion.div>
       </div>
@@ -270,70 +307,66 @@ export default function CategoryPageClient({
               {category?.name || 'Category'}
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              {t('explore_desc', { 
-                count, 
-                name, 
-                defaultValue: `Explore ${count} ${count === 1 ? 'post' : 'posts'} about ${name}. Discover tutorials, insights, and best practices.` 
-              })}
+              {t('explore_desc', { count, name: category?.name || 'Category' })}
             </p>
             
-            {/* Loading indicator for non-initial loads */}
-            {isLoading && !isInitialLoad && (
-              <div className="flex items-center justify-center gap-2 text-cyan-300">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-300"></div>
-                <span className="text-sm">Updating with latest data...</span>
+            {/* Category Badge */}
+            <div className="flex justify-center mb-8">
+              <div className="px-6 py-3 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-full font-medium">
+                {filteredPostsState.length} {filteredPostsState.length === 1 ? 'Post' : 'Posts'}
               </div>
-            )}
+            </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Blog Posts Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {filteredPosts.length === 0 ? (
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {filteredPostsState.length > 0 ? (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-20"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
           >
-            <div className="text-gray-400 text-lg mb-4">
-              {t('no_posts_found', { defaultValue: 'No posts found in this category.' })}
+            {/* Blog Posts Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPostsState.map((post, index) => (
+                <BlogCard
+                  key={post.id}
+                  title={post.title}
+                  description={post.excerpt || post.description || ''}
+                  category={post.category}
+                  category_data={post.category_data}
+                  imageUrl={post.image_url}
+                  date={post.created_at}
+                  linkUrl={`/learning/${category?.slug || 'general'}/${post.slug}`}
+                  linkText="Read More"
+                />
+              ))}
             </div>
-            <Link
-              href="/learning"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {t('back_to_learning', { defaultValue: 'Back to Learning' })}
-            </Link>
           </motion.div>
         ) : (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="text-center py-12"
           >
-            {filteredPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                variants={cardVariants}
-                custom={index}
+            <p className="text-gray-500 text-lg">
+              {t('explore_desc', { count: filteredPostsState.length, name: category?.name || 'Category' })}
+            </p>
+            <p className="text-gray-400 mt-2">
+              No posts available in this category yet.
+            </p>
+            <Link href="/learning">
+              <motion.button
+                className="px-6 py-3 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <BlogCard
-                  title={post.title}
-                  description={post.description || post.excerpt || ''}
-                  category={post.category_data?.name || category?.name || ''}
-                  imageUrl={post.image_url || ''}
-                  date={new Date(post.created_at).toLocaleDateString()}
-                  linkUrl={`/learning/${category?.slug}/${post.slug}`}
-                  linkText={t('read_more', { defaultValue: 'Read More' })}
-                />
-              </motion.div>
-            ))}
+                Explore Other Categories
+              </motion.button>
+            </Link>
           </motion.div>
         )}
       </div>
