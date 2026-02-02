@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack for nested paths
+        // GitHub Pages SPA redirect hack - Fixed for base path
         (function() {
             var path = window.location.pathname;
             var search = window.location.search;
@@ -20,8 +20,8 @@
             // Extract the correct path pattern: /learning/category/post-slug
             var correctedPath = extractCorrectPath(path);
             
-            // Redirect to index.html with hash-based routing
-            var redirectUrl = '/nextjsproject/#/nextjsproject' + correctedPath + search + hash;
+            // Redirect to index.html with hash-based routing (without base path duplication)
+            var redirectUrl = '/nextjsproject/#' + correctedPath + search + hash;
             
             // If we're already at the root with hash, don't redirect
             if (window.location.pathname !== '/nextjsproject/' || !window.location.hash) {
@@ -93,6 +93,7 @@
         // Show debug information
         document.getElementById('debugInfo').innerHTML = 
             'Original path: ' + window.location.pathname + '<br>' +
+            'Base path: /nextjsproject<br>' +
             'Correcting nested paths...';
     </script>
 </body>

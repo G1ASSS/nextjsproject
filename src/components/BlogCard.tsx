@@ -107,14 +107,14 @@ export default function BlogCard({
                 </motion.button>
               </Link>
             ) : (
-              // Production - use absolute hash routing for GitHub Pages
+              // Production - use absolute hash routing without path doubling
               <a 
-                href={`#/nextjsproject${linkUrl}`}
+                href={`#${linkUrl}`}
                 className="block"
                 onClick={(e) => {
                   e.preventDefault();
-                  // Use hash-based routing with base path
-                  window.location.hash = `/nextjsproject${linkUrl}`;
+                  // Use hash-based routing without base path duplication
+                  window.location.hash = linkUrl;
                   // Trigger a custom event for the router to handle
                   window.dispatchEvent(new HashChangeEvent('hashchange'));
                 }}

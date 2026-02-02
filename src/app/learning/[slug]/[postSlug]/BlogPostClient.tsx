@@ -32,29 +32,10 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
   // Handle hash routing for GitHub Pages
   useEffect(() => {
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
-      // Check if we have a hash-based route with base path
+      // Check if we have a hash-based route (simplified format)
       const hash = window.location.hash
-      if (hash && hash.startsWith('#/nextjsproject/learning/')) {
+      if (hash && hash.startsWith('#/learning/')) {
         // Parse the hash to extract category and post slugs
-        const hashPath = hash.substring(16) // Remove '#/nextjsproject/'
-        const pathParts = hashPath.split('/').filter(part => part.length > 0)
-        
-        if (pathParts.length >= 3 && pathParts[0] === 'learning') {
-          const categorySlug = pathParts[1]
-          const postSlug = pathParts[2]
-          
-          console.log('=== HASH ROUTING WITH BASE PATH DETECTED ===')
-          console.log('Category slug:', categorySlug)
-          console.log('Post slug:', postSlug)
-          
-          // If the current post doesn't match the hash, we need to fetch the correct post
-          if (post.slug !== postSlug) {
-            console.log('Post slug mismatch, fetching correct post from hash...')
-            fetchPostFromSlug(postSlug, categorySlug)
-          }
-        }
-      } else if (hash && hash.startsWith('#/learning/')) {
-        // Handle legacy hash format without base path
         const hashPath = hash.substring(2) // Remove '#/'
         const pathParts = hashPath.split('/').filter(part => part.length > 0)
         
@@ -62,10 +43,11 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           const categorySlug = pathParts[1]
           const postSlug = pathParts[2]
           
-          console.log('=== LEGACY HASH ROUTING DETECTED ===')
+          console.log('=== HASH ROUTING DETECTED ===')
           console.log('Category slug:', categorySlug)
           console.log('Post slug:', postSlug)
           
+          // If the current post doesn't match the hash, we need to fetch the correct post
           if (post.slug !== postSlug) {
             console.log('Post slug mismatch, fetching correct post from hash...')
             fetchPostFromSlug(postSlug, categorySlug)
