@@ -15,17 +15,52 @@ interface BlogPostPageProps {
   }>
 }
 
-// Force dynamic rendering for all slugs
-export const dynamic = 'force-dynamic'
-
-// Enable dynamic params for new slugs
-export const dynamicParams = true
+// Force static rendering for GitHub Pages
+export const dynamic = 'force-static'
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
-  // Return empty array to allow dynamic generation for all slugs
-  // This ensures any new post slug will work without code changes
-  return []
+  try {
+    // Get all categories to generate static paths
+    const { data: categories, error: categoriesError } = await supabase
+      .from('categories')
+      .select('id, slug')
+
+    if (categoriesError || !categories) {
+      console.error('Error fetching categories for static params:', categoriesError)
+      return []
+    }
+
+    // Generate params for all published posts
+    const allParams: Array<{ slug: string; postSlug: string }> = []
+
+    for (const category of categories) {
+      // Get all published posts for this category
+      const { data: posts, error: postsError } = await supabase
+        .from('blogs')
+        .select('slug')
+        .eq('category_id', category.id)
+        .eq('status', 'published')
+
+      if (postsError) {
+        console.error(`Error fetching posts for category ${category.slug}:`, postsError)
+      } else if (posts && posts.length > 0) {
+        // Get unique slugs to avoid duplicates across languages
+        const uniqueSlugs = Array.from(new Set(posts.map((post: any) => post.slug)))
+        const params = uniqueSlugs.map((slug: string) => ({
+          slug: category.slug,
+          postSlug: slug
+        }))
+        allParams.push(...params)
+      }
+    }
+
+    console.log(`Generated ${allParams.length} static params for blog posts`)
+    return allParams
+  } catch (error) {
+    console.error('Error in generateStaticParams:', error)
+    return []
+  }
 }
 
 // Generate metadata for SEO

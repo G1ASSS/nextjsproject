@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Temporarily disable static export to enable dynamic post pages
-  // output: 'export',
+  // Enable static export for GitHub Pages
+  output: 'export',
   basePath: '/nextjsproject',
   assetPrefix: '/nextjsproject',
   trailingSlash: true,
