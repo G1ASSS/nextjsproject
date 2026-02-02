@@ -29,34 +29,18 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
   const urlLocale = getLocaleFromPath(pathname)
   const effectiveLocale = currentLanguage || urlLocale || 'en'
 
-  // Handle hash routing for GitHub Pages
+  // Handle direct routing for GitHub Pages (no hash routing needed)
   useEffect(() => {
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
-      // Check if we have a hash-based route (simplified format)
-      const hash = window.location.hash
-      if (hash && hash.startsWith('#/learning/')) {
-        // Parse the hash to extract category and post slugs
-        const hashPath = hash.substring(2) // Remove '#/'
-        const pathParts = hashPath.split('/').filter(part => part.length > 0)
-        
-        if (pathParts.length >= 3 && pathParts[0] === 'learning') {
-          const categorySlug = pathParts[1]
-          const postSlug = pathParts[2]
-          
-          console.log('=== HASH ROUTING DETECTED ===')
-          console.log('Category slug:', categorySlug)
-          console.log('Post slug:', postSlug)
-          
-          // If the current post doesn't match the hash, we need to fetch the correct post
-          if (post.slug !== postSlug) {
-            console.log('Post slug mismatch, fetching correct post from hash...')
-            fetchPostFromSlug(postSlug, categorySlug)
-          }
-        }
-      }
+      console.log('=== DIRECT ROUTING MODE ===')
+      console.log('Current post slug:', post.slug)
+      console.log('Current pathname:', pathname)
+      
+      // No special routing needed with absolute paths
+      // Next.js basePath handles the routing automatically
     }
     setMounted(true)
-  }, [post.slug])
+  }, [post.slug, pathname])
 
   // Fetch post data from slug (for hash routing)
   const fetchPostFromSlug = async (postSlug: string, categorySlug: string) => {

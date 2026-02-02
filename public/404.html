@@ -5,27 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack - Fixed for base path
+        // GitHub Pages SPA redirect hack - Universal path handling
         (function() {
             var path = window.location.pathname;
             var search = window.location.search;
             var hash = window.location.hash;
             
+            console.log('=== 404.html DEBUG ===');
+            console.log('Original path:', path);
+            
             // Remove the /nextjsproject prefix if present
             if (path.startsWith('/nextjsproject')) {
                 path = path.replace('/nextjsproject', '');
+                console.log('After removing base path:', path);
             }
             
             // Handle nested path errors like /learning/html/learning/html/testing
             // Extract the correct path pattern: /learning/category/post-slug
             var correctedPath = extractCorrectPath(path);
+            console.log('Corrected path:', correctedPath);
             
-            // Redirect to index.html with hash-based routing (without base path duplication)
-            var redirectUrl = '/nextjsproject/#' + correctedPath + search + hash;
+            // Remove trailing slashes to prevent duplication
+            correctedPath = correctedPath.replace(/\/+$/, '');
+            console.log('Final path (no trailing slash):', correctedPath);
             
-            // If we're already at the root with hash, don't redirect
-            if (window.location.pathname !== '/nextjsproject/' || !window.location.hash) {
+            // Redirect to the correct absolute path
+            var redirectUrl = '/nextjsproject' + correctedPath + search + hash;
+            console.log('Redirect URL:', redirectUrl);
+            
+            // If we're already at the correct path, don't redirect
+            if (window.location.pathname !== redirectUrl) {
+                console.log('Redirecting to:', redirectUrl);
                 window.location.replace(redirectUrl);
+            } else {
+                console.log('Already at correct path, no redirect needed');
             }
         })();
         
@@ -34,15 +47,26 @@
             // Handle cases like /learning/html/learning/html/testing
             // Extract the first valid pattern: /learning/category/slug
             var parts = path.split('/').filter(function(part) { return part.length > 0; });
+            console.log('Path parts:', parts);
             
             if (parts.length >= 3 && parts[0] === 'learning') {
                 // Found valid pattern: /learning/category/slug
-                return '/' + parts.slice(0, 3).join('/');
+                var result = '/' + parts.slice(0, 3).join('/');
+                console.log('Extracted valid pattern:', result);
+                return result;
+            } else if (parts.length >= 2 && parts[0] === 'learning') {
+                // Fallback to learning/category
+                var result = '/' + parts.slice(0, 2).join('/');
+                console.log('Extracted category pattern:', result);
+                return result;
             } else if (parts.length >= 1) {
                 // Fallback to first part
-                return '/' + parts[0];
+                var result = '/' + parts[0];
+                console.log('Extracted single part:', result);
+                return result;
             } else {
                 // Default to root
+                console.log('Defaulting to root');
                 return '/';
             }
         }
@@ -79,6 +103,10 @@
             margin-top: 1rem;
             font-size: 0.8rem;
             opacity: 0.7;
+            text-align: left;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -91,10 +119,13 @@
     </div>
     <script>
         // Show debug information
-        document.getElementById('debugInfo').innerHTML = 
-            'Original path: ' + window.location.pathname + '<br>' +
-            'Base path: /nextjsproject<br>' +
-            'Correcting nested paths...';
+        setTimeout(function() {
+            document.getElementById('debugInfo').innerHTML = 
+                'Original path: ' + window.location.pathname + '<br>' +
+                'Base path: /nextjsproject<br>' +
+                'Processing path...<br>' +
+                'Check browser console for detailed debugging';
+        }, 100);
     </script>
 </body>
 </html>
