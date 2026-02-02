@@ -29,6 +29,64 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
   const urlLocale = getLocaleFromPath(pathname)
   const effectiveLocale = currentLanguage || urlLocale || 'en'
 
+  // Handle hash routing for GitHub Pages
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+      // Check if we have a hash-based route
+      const hash = window.location.hash
+      if (hash && hash.startsWith('#/learning/')) {
+        // Parse the hash to extract category and post slugs
+        const hashPath = hash.substring(2) // Remove '#/'
+        const pathParts = hashPath.split('/').filter(part => part.length > 0)
+        
+        if (pathParts.length >= 3 && pathParts[0] === 'learning') {
+          const categorySlug = pathParts[1]
+          const postSlug = pathParts[2]
+          
+          console.log('=== HASH ROUTING DETECTED ===')
+          console.log('Category slug:', categorySlug)
+          console.log('Post slug:', postSlug)
+          
+          // If the current post doesn't match the hash, we need to fetch the correct post
+          if (post.slug !== postSlug) {
+            console.log('Post slug mismatch, fetching correct post from hash...')
+            fetchPostFromSlug(postSlug, categorySlug)
+          }
+        }
+      }
+    }
+    setMounted(true)
+  }, [post.slug])
+
+  // Fetch post data from slug (for hash routing)
+  const fetchPostFromSlug = async (postSlug: string, categorySlug: string) => {
+    setLoading(true)
+    try {
+      console.log('Fetching post from slug:', postSlug, 'category:', categorySlug)
+      
+      const { data: postData, error } = await supabase
+        .from('blogs')
+        .select(`
+          *,
+          categories(id, name, slug)
+        `)
+        .eq('slug', postSlug)
+        .eq('status', 'published')
+        .single()
+
+      if (postData && !error) {
+        console.log('Successfully fetched post from hash:', postData.title)
+        setCurrentPost(postData)
+      } else {
+        console.error('Error fetching post from hash:', error)
+      }
+    } catch (err) {
+      console.error('Error in fetchPostFromSlug:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Client-side fetch to get the latest post data with cache-busting
   useEffect(() => {
     const fetchLatestPost = async () => {

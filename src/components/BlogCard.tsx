@@ -107,33 +107,26 @@ export default function BlogCard({
                 </motion.button>
               </Link>
             ) : (
-              // Production - redirect dynamic routes to Vercel (excluding learning routes)
-              (linkUrl.includes('/projects/') || linkUrl.includes('/tools/')) ? (
-                <a 
-                  href={`https://g1ass.vercel.app${linkUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
+              // Production - use hash routing for GitHub Pages
+              <a 
+                href={`#${linkUrl}`}
+                className="block"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Use hash-based routing for GitHub Pages
+                  window.location.hash = linkUrl;
+                  // Trigger a custom event for the router to handle
+                  window.dispatchEvent(new HashChangeEvent('hashchange'));
+                }}
+              >
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full px-4 py-2 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors mt-4"
                 >
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full px-4 py-2 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors mt-4"
-                  >
-                    {linkText}
-                  </motion.button>
-                </a>
-              ) : (
-                <Link href={linkUrl} className="block">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full px-4 py-2 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors mt-4"
-                  >
-                    {linkText}
-                  </motion.button>
-                </Link>
-              )
+                  {linkText}
+                </motion.button>
+              </a>
             )}
           </>
         ) : (
