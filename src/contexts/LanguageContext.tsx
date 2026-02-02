@@ -7,7 +7,7 @@ export type Language = 'en' | 'my' | 'th' | 'es' | 'zh'
 interface LanguageContextType {
   currentLanguage: Language
   setLanguage: (language: Language) => void
-  t: (key: string, options?: { defaultValue?: string }) => string
+  t: (key: string, options?: { defaultValue?: string; [key: string]: any }) => string
 }
 
 const translations = {
@@ -32,12 +32,12 @@ const translations = {
     search_placeholder: 'Search categories...',
     back_to_learning: 'Back to Learning',
     explore_desc: {
-      single: 'Explore {count} post about {name}. Discover tutorials, insights, and best practices.',
-      plural: 'Explore {count} posts about {name}. Discover tutorials, insights, and best practices.'
+      single: 'Explore {{count}} post about {{name}}. Discover tutorials, insights, and best practices.',
+      plural: 'Explore {{count}} posts about {{name}}. Discover tutorials, insights, and best practices.'
     },
     categoryDescription: {
-      single: 'Explore {count} post about {name}. Discover tutorials, insights, and best practices in this area.',
-      plural: 'Explore {count} posts about {name}. Discover tutorials, insights, and best practices in this area.'
+      single: 'Explore {{count}} post about {{name}}. Discover tutorials, insights, and best practices in this area.',
+      plural: 'Explore {{count}} posts about {{name}}. Discover tutorials, insights, and best practices in this area.'
     },
     languages: {
       en: 'English',
@@ -67,8 +67,8 @@ const translations = {
     learning_title_part2: 'မျှဝေခြင်း',
     search_placeholder: 'အမျိုးအစားများကို ရှာဖွေပါ...',
     back_to_learning: 'လေ့လာမှုသို့ ပြန်သွားရန်',
-    explore_desc: '{name} နှင့်ပတ်သက်သော သင်ခန်းစာ {count} ခုကို လေ့လာပါ။ နည်းပညာနှင့် အကောင်းအထောက်အပံ့များကို ရှာဖွေနိုင်ပါသည်။',
-    categoryDescription: '{name} နှင့်ပတ်သက်သော သင်ခန်းစာ {count} ခုကို လေ့လာပါ။ ဤကဏ္ဍတွင် နည်းပညာအသစ်များနှင့် ကောင်းမွန်သော လုပ်ဆောင်ချက်များကို ရှာဖွေနိုင်ပါသည်။',
+    explore_desc: '{{name}} နှင့ပတ်သက်သော သင်ခန်းစာ {{count}} ခုကို လေ့လာပါ။ နည်းပညာနှင့် အကောင်းအထောက်အပံ့များကို ရှာဖွေနိုင်ပါသည်။',
+    categoryDescription: '{{name}} နှင့်ပတ်သက်သော သင်ခန်းစာ {{count}} ခုကို လေ့လာပါ။ ဤကဏ္ဍတွင် နည်းပညာအသစ်များနှင့် ကောင်းမွန်သော လုပ်ဆောင်ချက်များကို ရှာဖွေနိုင်ပါသည်။',
     languages: {
       en: 'English',
       my: 'မြန်မာ',
@@ -98,12 +98,12 @@ const translations = {
     search_placeholder: 'ค้นหาหมวดหมู่...',
     back_to_learning: 'กลับไปที่การเรียนรู้',
     explore_desc: {
-      single: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุด',
-      plural: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุด'
+      single: 'สำรวจ {{count}} บทความเกี่ยวกับ {{name}} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุด',
+      plural: 'สำรวจ {{count}} บทความเกี่ยวกับ {{name}} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุด'
     },
     categoryDescription: {
-      single: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุดในด้านนี้',
-      plural: 'สำรวจ {count} บทความเกี่ยวกับ {name} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุดในด้านนี้'
+      single: 'สำรวจ {{count}} บทความเกี่ยวกับ {{name}} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุดในด้านนี้',
+      plural: 'สำรวจ {{count}} บทความเกี่ยวกับ {{name}} ค้นพบบทเรียน ข้อมูลเชิงลึก และแนวทางปฏิบัติที่ดีที่สุดในด้านนี้'
     },
     languages: {
       en: 'English',
@@ -134,12 +134,12 @@ const translations = {
     search_placeholder: 'Buscar categorías...',
     back_to_learning: 'Volver al Aprendizaje',
     explore_desc: {
-      single: 'Explora {count} publicación sobre {name}. Descubre tutoriales, ideas y mejores prácticas.',
-      plural: 'Explora {count} publicaciones sobre {name}. Descubre tutoriales, ideas y mejores prácticas.'
+      single: 'Explora {{count}} publicación sobre {{name}}. Descubre tutoriales, ideas y mejores prácticas.',
+      plural: 'Explora {{count}} publicaciones sobre {{name}}. Descubre tutoriales, ideas y mejores prácticas.'
     },
     categoryDescription: {
-      single: 'Explora {count} publicación sobre {name}. Descubre tutoriales, ideas y mejores prácticas en esta área.',
-      plural: 'Explora {count} publicaciones sobre {name}. Descubre tutoriales, ideas y mejores prácticas en esta área.'
+      single: 'Explora {{count}} publicación sobre {{name}}. Descubre tutoriales, ideas y mejores prácticas en esta área.',
+      plural: 'Explora {{count}} publicaciones sobre {{name}}. Descubre tutoriales, ideas y mejores prácticas en esta área.'
     },
     languages: {
       en: 'English',
@@ -170,12 +170,12 @@ const translations = {
     search_placeholder: '搜索分类...',
     back_to_learning: '返回学习',
     explore_desc: {
-      single: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。',
-      plural: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。'
+      single: '探索关于 {{name}} 的 {{count}} 篇文章。发现本领域的教程、见解和最佳实践。',
+      plural: '探索关于 {{name}} 的 {{count}} 篇文章。发现本领域的教程、见解和最佳实践。'
     },
     categoryDescription: {
-      single: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。',
-      plural: '探索关于 {name} 的 {count} 篇文章。发现本领域的教程、见解和最佳实践。'
+      single: '探索关于 {{name}} 的 {{count}} 篇文章。发现本领域的教程、见解和最佳实践。',
+      plural: '探索关于 {{name}} 的 {{count}} 篇文章。发现本领域的教程、见解和最佳实践。'
     },
     languages: {
       en: '英语',
@@ -207,31 +207,98 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const setLanguage = (language: Language) => {
     setCurrentLanguage(language)
   }
-
-  const t = (key: string, options?: { defaultValue?: string }): string => {
+  const t = (key: string, options?: { defaultValue?: string; [key: string]: any }): string => {
+    console.log('=== TRANSLATION DEBUG ===')
+    console.log('Looking for key:', key)
+    console.log('Options:', options)
+    
     const keys = key.split('.')
     let value: any = translations[currentLanguage]
     
-    for (const k of keys) {
-      value = value?.[k]
+    console.log('Current language:', currentLanguage)
+    console.log('Available keys in language:', Object.keys(translations[currentLanguage] || {}))
+    
+    // Check if the entire language dictionary exists
+    if (!translations[currentLanguage]) {
+      console.warn(`Language dictionary for '${currentLanguage}' not found, falling back to English`)
+      value = translations['en']
+    } else {
+      // Navigate through the nested keys
+      for (const k of keys) {
+        value = value?.[k]
+        console.log(`After navigating to '${k}':`, value)
+      }
     }
+    
+    console.log('Final value:', value)
     
     // If translation not found in current language, fallback to English
     if (value === undefined || value === null) {
+      console.warn(`Translation key '${key}' not found for '${currentLanguage}', falling back to English`)
       let fallbackValue: any = translations['en']
       for (const k of keys) {
         fallbackValue = fallbackValue?.[k]
+        console.log(`English fallback after '${k}':`, fallbackValue)
       }
       
       // If English fallback also not found, use defaultValue or return the key
       if (fallbackValue === undefined || fallbackValue === null) {
+        console.warn(`Translation key '${key}' not found in English fallback, using defaultValue or key`)
         return options?.defaultValue || key
       }
       
-      return fallbackValue
+      value = fallbackValue
     }
     
-    return value || options?.defaultValue || key
+    // Handle variable interpolation (e.g., {{count}}, {{name}})
+    if (typeof value === 'string' && options) {
+      const interpolated = value.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+        const replacement = options[key] !== undefined ? String(options[key]) : match
+        console.log(`Replacing {{${key}}} with:`, replacement)
+        return replacement
+      })
+      console.log('Interpolated result:', interpolated)
+      return interpolated
+    }
+    
+    // Handle pluralization if value is an object with single/plural
+    if (typeof value === 'object' && value !== null) {
+      console.log('Value is object, handling pluralization')
+      const count = options?.count || 1
+      console.log('Count for pluralization:', count)
+      
+      let selectedValue: string
+      // Treat 0 as plural, 1 as singular
+      if (count === 1 && value.single) {
+        console.log('Using singular form:', value.single)
+        selectedValue = value.single
+      } else if (count !== 1 && value.plural) {
+        console.log('Using plural form:', value.plural)
+        selectedValue = value.plural
+      } else {
+        // Default to first available value
+        const firstValue = Object.values(value)[0]
+        selectedValue = firstValue ? String(firstValue) : String(options?.defaultValue || key)
+      }
+      
+      // Handle interpolation for the selected value
+      if (typeof selectedValue === 'string' && options) {
+        const interpolated = selectedValue.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          const replacement = options[key] !== undefined ? String(options[key]) : match
+          console.log(`Replacing {{${key}}} with:`, replacement)
+          return replacement
+        })
+        console.log('Interpolated result:', interpolated)
+        return interpolated
+      }
+      
+      return String(selectedValue)
+    }
+    
+    console.log('Final return value:', String(value || options?.defaultValue || key))
+    console.log('=== END TRANSLATION DEBUG ===')
+    
+    return String(value || options?.defaultValue || key)
   }
 
   return (

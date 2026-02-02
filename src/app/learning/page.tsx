@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { getCategories, Category } from '@/lib/categories'
-import { getBlogPosts, BlogPost } from '@/lib/blog'
+import { getCategoryPostCounts, getLocaleFromPath } from '@/lib/dynamicQueries'
 import Link from 'next/link'
 import { Layout, Palette, Code2, Webhook, Database, ShieldCheck, Search, X } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { usePathname } from 'next/navigation'
 
 // Icon mapping for categories
 const getCategoryIcon = (slug: string) => {
@@ -27,6 +28,7 @@ const getCategoryIcon = (slug: string) => {
 
 export default function LearningPage() {
   const { t, currentLanguage } = useLanguage()
+  const pathname = usePathname()
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesWithCounts, setCategoriesWithCounts] = useState<Array<{category: Category, count: number}>>([])
   const [loading, setLoading] = useState(true)
@@ -35,37 +37,36 @@ export default function LearningPage() {
 
   // Helper function to render localized title with styled "Sharing" part
   const renderLearningTitle = () => {
-    if (currentLanguage === 'en') {
-      return (
-        <>
-          {t('learning_title_part1')} <span className="text-cyan-400">{t('learning_title_part2')}</span>
-        </>
-      )
-    } else {
-      return (
-        <>
-          {t('learning_title_part1')} <span className="text-cyan-400">{t('learning_title_part2')}</span>
-        </>
-      )
-    }
+    return (
+      <>
+        {t('learning_title_part1')} <span className="text-cyan-400">{t('learning_title_part2')}</span>
+      </>
+    )
   }
 
-  // Fetch categories and post counts
+  // Fetch categories and dynamic post counts
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        console.log('Starting to fetch categories...')
+        console.log('=== DYNAMIC LEARNING PAGE DEBUG ===')
         
-        // First, try to get categories from Supabase
+        // Get locale from URL path or use current language from context
+        const urlLocale = getLocaleFromPath(pathname)
+        const effectiveLocale = currentLanguage || urlLocale || 'en'
+        
+        console.log('Pathname:', pathname)
+        console.log('URL locale:', urlLocale)
+        console.log('Current language from context:', currentLanguage)
+        console.log('Effective locale for queries:', effectiveLocale)
+        
+        // Fetch categories
         let categoriesData: Category[] = []
-        
         try {
           categoriesData = await getCategories()
           console.log('Categories fetched from Supabase:', categoriesData.length)
         } catch (error) {
           console.log('Error fetching from Supabase, using fallback:', error)
-          // Use fallback categories
           categoriesData = [
             { id: '1', name: 'HTML', slug: 'html', created_at: '', updated_at: '' },
             { id: '2', name: 'CSS', slug: 'css', created_at: '', updated_at: '' },
@@ -81,72 +82,37 @@ export default function LearningPage() {
         }
         
         setCategories(categoriesData)
-        console.log('Final categories set:', categoriesData.length)
         
-        // Try to fetch blog posts for counting
+        // Get dynamic post counts for the current locale
         try {
-          const allPosts = await getBlogPosts()
-          console.log('Blog posts fetched:', allPosts.length)
+          console.log('Fetching category counts for locale:', effectiveLocale)
+          const categoryCounts = await getCategoryPostCounts(effectiveLocale)
+          console.log('Category counts received:', categoryCounts)
           
-          // Get current language from LanguageContext
-          const currentLang = typeof window !== 'undefined' 
-            ? localStorage.getItem('language') || 'en'
-            : 'en';
+          // Merge categories with their counts
+          const categoriesWithCounts = categoriesData.map(category => ({
+            category,
+            count: categoryCounts[category.slug] || 0
+          }))
           
-          console.log('Current language for counting:', currentLang)
+          console.log('Categories with counts:', categoriesWithCounts.map(({ category, count }) => ({
+            name: category.name,
+            slug: category.slug,
+            count
+          })))
           
-          // Filter posts by current language
-          const postsInCurrentLang = allPosts.filter(post => post.language === currentLang)
-          console.log('Posts in current language:', postsInCurrentLang.length)
-          
-          // Debug: Show sample post structure
-          if (postsInCurrentLang.length > 0) {
-            console.log('Sample post structure:', postsInCurrentLang[0])
-            console.log('Sample post category_data:', postsInCurrentLang[0].category_data)
-            console.log('Sample post category:', postsInCurrentLang[0].category)
-            console.log('Sample post category_id:', postsInCurrentLang[0].category_id)
-          }
-          
-          // Count posts per category
-          const categoryCounts = categoriesData.map(category => {
-            console.log('Counting posts for category:', category.slug, category.name)
-            
-            const count = postsInCurrentLang.filter(post => {
-              console.log('Checking post:', post.title, 'against category:', category.slug)
-              
-              // Try multiple matching strategies
-              if (post.category_data && post.category_data.slug === category.slug) {
-                console.log('Match found via category_data.slug')
-                return true
-              }
-              
-              if (post.category && post.category.toLowerCase() === category.name.toLowerCase()) {
-                console.log('Match found via category name')
-                return true
-              }
-              
-              if (post.category_id && post.category_id === category.id) {
-                console.log('Match found via category_id')
-                return true
-              }
-              
-              return false
-            }).length
-            
-            console.log('Final count for', category.name, ':', count)
-            return { category, count }
-          })
-          
-          setCategoriesWithCounts(categoryCounts)
-          console.log('Category counts calculated:', categoryCounts.length)
-          console.log('Final category counts:', categoryCounts.map(({ category, count }) => ({ name: category.name, count })))
-        } catch (postError) {
-          console.log('Error fetching posts, using zero counts:', postError)
+          setCategoriesWithCounts(categoriesWithCounts)
+        } catch (countError) {
+          console.log('Error fetching category counts:', countError)
           // Set zero counts for all categories
-          const categoryCounts = categoriesData.map(category => ({ category, count: 0 }))
-          setCategoriesWithCounts(categoryCounts)
+          const categoriesWithZeroCounts = categoriesData.map(category => ({
+            category,
+            count: 0
+          }))
+          setCategoriesWithCounts(categoriesWithZeroCounts)
         }
         
+        console.log('=== END DYNAMIC LEARNING PAGE DEBUG ===')
       } catch (error) {
         console.error('Major error in fetchData:', error)
         // Set fallback categories with zero counts
@@ -159,12 +125,11 @@ export default function LearningPage() {
         setCategoriesWithCounts(fallbackCategories.map(cat => ({ category: cat, count: 0 })))
       } finally {
         setLoading(false)
-        console.log('Data fetching completed, loading set to false')
       }
     }
 
     fetchData()
-  }, [])
+  }, [currentLanguage, pathname]) // Re-fetch when language or path changes
 
   // Real-time search filtering
   useEffect(() => {

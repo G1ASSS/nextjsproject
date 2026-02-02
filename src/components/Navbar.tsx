@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Home, BookOpen, Terminal, Briefcase, User, Mail, X } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 
@@ -13,6 +13,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { currentLanguage, setLanguage, t } = useLanguage()
   const pathname = usePathname()
+  const router = useRouter()
 
   // Helper function to detect Myanmar text and adjust font size
   const getTextClassName = (text: string, baseClass: string = '') => {
@@ -44,6 +45,58 @@ const Navbar = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false)
+  }
+
+  // Handle language switching with URL redirection
+  const handleLanguageSwitch = (newLanguage: string) => {
+    setLanguage(newLanguage as any)
+    setIsLanguageDropdownOpen(false)
+    closeMobileMenu()
+
+    // Use pathname from Next.js router (includes base path handling)
+    const currentPath = pathname
+    
+    console.log('Language switch debug:', { currentPath, newLanguage })
+    
+    // Handle blog post pages - use same slug for all languages
+    if (currentPath.startsWith('/learning/') && currentPath.split('/').length >= 4) {
+      const pathParts = currentPath.split('/')
+      const categorySlug = pathParts[2] // /learning/[slug]/[postSlug] -> [slug]
+      let postSlug = pathParts[3] // /learning/[slug]/[postSlug] -> [postSlug]
+      
+      console.log('Blog post detected:', { categorySlug, postSlug })
+      
+      // Remove any existing -my suffix (both languages use same slug now)
+      const cleanPostSlug = postSlug.replace('-my', '')
+      
+      // Keep the same URL structure, just change language state
+      const newPath = `/learning/${categorySlug}/${cleanPostSlug}`
+      console.log('Navigating to:', newPath)
+      
+      // Navigate to the new URL
+      router.push(newPath)
+    }
+    // Handle category pages - stay on same page, content updates via language filter
+    else if (currentPath.startsWith('/learning/') && currentPath.split('/').length === 3) {
+      console.log('Category page detected, staying on current page')
+      // Just stay on the same category page, content will update via language filter
+      // No URL change needed for category pages since both languages use same slug
+    }
+    // Handle main learning page
+    else if (currentPath === '/learning') {
+      console.log('Learning page detected, staying on current page')
+      // Stay on learning page, content updates via language filter
+    }
+    // Handle home page - stay on home
+    else if (currentPath === '/') {
+      console.log('Home page detected, staying on current page')
+      // Stay on home page, content updates via language filter
+    }
+    // Handle all other pages - redirect to learning page
+    else {
+      console.log('Other page detected, redirecting to learning')
+      router.push('/learning')
+    }
   }
 
   const languages = [
@@ -192,10 +245,7 @@ const Navbar = () => {
                       {languages.map((lang) => (
                         <motion.button
                           key={lang.code}
-                          onClick={() => {
-                            setLanguage(lang.code as any)
-                            setIsLanguageDropdownOpen(false)
-                          }}
+                          onClick={() => handleLanguageSwitch(lang.code)}
                           className={`w-full flex items-center space-x-3 px-4 py-2 text-sm hover:bg-white/10 transition-colors ${
                             currentLanguage === lang.code ? 'bg-white/10 text-blue-300' : 'text-white'
                           }`}
@@ -348,10 +398,7 @@ const Navbar = () => {
                       initial={{ opacity: 0, x: 5 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.6 + index * 0.05, duration: 0.2 }}
-                      onClick={() => {
-                        setLanguage(lang.code as any)
-                        closeMobileMenu()
-                      }}
+                      onClick={() => handleLanguageSwitch(lang.code)}
                       className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl border transition-all text-sm font-medium ${
                         currentLanguage === lang.code 
                           ? 'bg-cyan-500/20 border-cyan-400/40 text-cyan-300' 

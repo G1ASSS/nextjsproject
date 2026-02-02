@@ -10,9 +10,9 @@ import Terminal from '@/components/Terminal'
 import VideoModal from '@/components/VideoModal'
 import { Certifications } from '@/components/Certifications'
 import { PROFILE_CONFIG } from '@/config/profile'
-import { getBlogPosts, BlogPost, testSupabaseConnection } from '@/lib/blog'
-import { getTools, Tool, testToolsConnection } from '@/lib/tools'
-import { getProjects, Project, testProjectsConnection } from '@/lib/projects'
+import { getBlogPosts, BlogPost } from '@/lib/blog'
+import { getTools, Tool } from '@/lib/tools'
+import { getProjects, Project } from '@/lib/projects'
 import BlogCard from '@/components/BlogCard'
 
 // Learning logs data
@@ -126,16 +126,8 @@ export default function Home() {
   useEffect(() => {
     const fetchBlogPosts = async () => {
       try {
-        // Test connection first
-        const isConnected = await testSupabaseConnection()
-        console.log('Supabase connection status:', isConnected)
-        
-        if (isConnected) {
-          const posts = await getBlogPosts()
-          setBlogPosts(posts)
-        } else {
-          console.log('Failed to connect to Supabase, using fallback data')
-        }
+        const posts = await getBlogPosts()
+        setBlogPosts(posts)
       } catch (error) {
         console.error('Error in fetchBlogPosts:', error)
       }
@@ -148,16 +140,8 @@ export default function Home() {
   useEffect(() => {
     const fetchTools = async () => {
       try {
-        // Test connection first
-        const isConnected = await testToolsConnection()
-        console.log('Tools Supabase connection status:', isConnected)
-        
-        if (isConnected) {
-          const toolsData = await getTools()
-          setTools(toolsData)
-        } else {
-          console.log('Failed to connect to Tools Supabase, using fallback data')
-        }
+        const toolsData = await getTools()
+        setTools(toolsData)
       } catch (error) {
         console.error('Error in fetchTools:', error)
       }
@@ -170,16 +154,8 @@ export default function Home() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        // Test connection first
-        const isConnected = await testProjectsConnection()
-        console.log('Projects Supabase connection status:', isConnected)
-        
-        if (isConnected) {
-          const projectsData = await getProjects()
-          setProjects(projectsData)
-        } else {
-          console.log('Failed to connect to Projects Supabase, using fallback data')
-        }
+        const projectsData = await getProjects()
+        setProjects(projectsData)
       } catch (error) {
         console.error('Error in fetchProjects:', error)
       } finally {
