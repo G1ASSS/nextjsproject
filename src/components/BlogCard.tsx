@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import MarkdownRenderer from './MarkdownRenderer'
 import { CategoryBadge } from './CategoryFilter'
 import { Category } from '@/lib/categories'
@@ -26,6 +27,28 @@ export default function BlogCard({
   linkUrl,
   linkText = 'View Details'
 }: BlogCardProps) {
+  // State for client-side date formatting
+  const [formattedDate, setFormattedDate] = useState<string>('')
+
+  // Format date only on client-side to prevent hydration mismatch
+  useEffect(() => {
+    if (date) {
+      try {
+        // Use consistent date formatting to prevent hydration issues
+        const dateObj = new Date(date)
+        const formatted = dateObj.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        })
+        setFormattedDate(formatted)
+      } catch (error) {
+        console.error('Error formatting date:', error)
+        setFormattedDate(date || '') // Fallback to original date
+      }
+    }
+  }, [date])
+
   return (
     <motion.div
       variants={{}}
@@ -57,7 +80,9 @@ export default function BlogCard({
           <MarkdownRenderer content={description} />
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">{date}</span>
+          <span className="text-xs text-gray-400" suppressHydrationWarning={true}>
+            {formattedDate || date}
+          </span>
           {category_data ? (
             <CategoryBadge category={category_data} />
           ) : category ? (
