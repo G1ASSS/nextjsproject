@@ -14,11 +14,15 @@ export default function GitHubPagesRouter({ children }: GitHubPagesRouterProps) 
   useEffect(() => {
     // Only run in production and on client-side
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
-      // Handle initial hash-based routing
+      // Handle initial hash-based routing with base path
       const handleHashRouting = () => {
         const hash = window.location.hash
-        if (hash && hash.startsWith('#/')) {
-          // Remove the #/ prefix and navigate to the route
+        if (hash && hash.startsWith('#/nextjsproject/')) {
+          // Remove the #/nextjsproject/ prefix and navigate to the route
+          const route = hash.substring(16) // Remove '#/nextjsproject/'
+          router.push(route)
+        } else if (hash && hash.startsWith('#/')) {
+          // Handle legacy hash format without base path
           const route = hash.substring(2) // Remove '#/'
           router.push(route)
         }
@@ -43,7 +47,10 @@ export default function GitHubPagesRouter({ children }: GitHubPagesRouterProps) 
         if (link) {
           e.preventDefault()
           const href = link.getAttribute('href')
-          if (href && href.startsWith('#/')) {
+          if (href && href.startsWith('#/nextjsproject/')) {
+            const route = href.substring(16) // Remove '#/nextjsproject/'
+            router.push(route)
+          } else if (href && href.startsWith('#/')) {
             const route = href.substring(2) // Remove '#/'
             router.push(route)
           }
