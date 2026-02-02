@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack - Universal path handling
+        // GitHub Pages SPA redirect hack - Permanent solution with index.html
         (function() {
             var path = window.location.pathname;
             var search = window.location.search;
             var hash = window.location.hash;
             
-            console.log('=== 404.html DEBUG ===');
+            console.log('=== 404.html INDEX.HTML REDIRECT ===');
             console.log('Original path:', path);
             
             // Remove the /nextjsproject prefix if present
@@ -29,17 +29,13 @@
             correctedPath = correctedPath.replace(/\/+$/, '');
             console.log('Final path (no trailing slash):', correctedPath);
             
-            // Redirect to the correct absolute path
-            var redirectUrl = '/nextjsproject' + correctedPath + search + hash;
-            console.log('Redirect URL:', redirectUrl);
+            // Redirect to index.html with path parameter
+            var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(correctedPath) + search + hash;
+            console.log('Redirect URL to index.html:', redirectUrl);
             
-            // If we're already at the correct path, don't redirect
-            if (window.location.pathname !== redirectUrl) {
-                console.log('Redirecting to:', redirectUrl);
-                window.location.replace(redirectUrl);
-            } else {
-                console.log('Already at correct path, no redirect needed');
-            }
+            // Force immediate redirect to index.html
+            console.log('REDIRECTING TO index.html WITH PATH PARAMETER...');
+            window.location.replace(redirectUrl);
         })();
         
         // Function to extract correct path from nested paths
@@ -123,7 +119,7 @@
             document.getElementById('debugInfo').innerHTML = 
                 'Original path: ' + window.location.pathname + '<br>' +
                 'Base path: /nextjsproject<br>' +
-                'Processing path...<br>' +
+                'Redirecting to index.html with path parameter...<br>' +
                 'Check browser console for detailed debugging';
         }, 100);
     </script>

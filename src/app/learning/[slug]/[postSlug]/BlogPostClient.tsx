@@ -84,7 +84,9 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
         console.log('=== CLIENT-SIDE POST FETCH ===')
         console.log('Fetching latest post data for:', post.slug)
         console.log('Effective locale:', effectiveLocale)
+        console.log('Cache-busting:', cacheBuster)
         
+        // First try to fetch by slug (works for new posts)
         const { data: latestPost, error } = await supabase
           .from('blogs')
           .select(`
@@ -100,12 +102,35 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           console.log('Fetched latest post:', latestPost.title)
           console.log('Post language:', latestPost.language)
           console.log('Post updated_at:', latestPost.updated_at)
+          console.log('Post category:', latestPost.categories?.slug)
           
           setCurrentPost(latestPost)
         } else {
           console.log('=== POST FETCH ERROR ===')
           console.log('Error:', error)
-          // Keep the original post if fetch fails
+          console.log('This might be a new slug not in static build')
+          
+          // Try fallback fetch for new posts by checking all languages
+          const { data: fallbackPost, error: fallbackError } = await supabase
+            .from('blogs')
+            .select(`
+              *,
+              categories(id, name, slug)
+            `)
+            .eq('slug', post.slug)
+            .eq('status', 'published')
+            .limit(1)
+            .single()
+
+          if (fallbackPost && !fallbackError) {
+            console.log('=== FALLBACK POST FETCH SUCCESS ===')
+            console.log('Found post with fallback:', fallbackPost.title)
+            setCurrentPost(fallbackPost)
+          } else {
+            console.log('=== ALL FETCH ATTEMPTS FAILED ===')
+            console.log('Fallback error:', fallbackError)
+            // Keep the original post if all fetches fail
+          }
         }
       } catch (err) {
         console.error('Error fetching latest post:', err)
