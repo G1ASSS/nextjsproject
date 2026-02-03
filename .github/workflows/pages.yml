@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  repository_dispatch:
+    types: [supabase_update]
+  workflow_dispatch:
 
 # Sets permissions for the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -23,6 +26,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Log trigger source
+      run: |
+        echo "🚀 Workflow triggered by: ${{ github.event_name }}"
+        if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+          echo "📦 Supabase update detected!"
+          echo "📋 Event data: ${{ github.event.client_payload }}"
+        elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "🔧 Manual workflow dispatch"
+        else
+          echo "📝 Code push to ${{ github.ref }}"
+        fi
+
     - name: Checkout
       uses: actions/checkout@v4
 
@@ -33,7 +48,13 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline --no-audit
+
+    - name: Clear Next.js cache
+      run: |
+        echo "🧹 Clearing Next.js cache for fresh build..."
+        rm -rf .next
+        rm -rf out
 
     - name: Setup environment variables
       run: |
@@ -44,12 +65,21 @@ jobs:
     - name: Prepare GitHub Pages build
       run: node scripts/build-github-pages.js
 
-    - name: Build
-      run: npm run build
+    - name: Build with optimization
+      run: |
+        echo "🏗️ Building Next.js static export..."
+        echo "📊 Build environment: ${{ runner.os }}"
+        echo "🔧 Node version: $(node --version)"
+        echo "📦 npm version: $(npm --version)"
+        npm run build
+        echo "✅ Build completed successfully!"
+        echo "📁 Build output size:"
+        du -sh out/ || echo "No out directory found"
       env:
         NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        NODE_OPTIONS: '--max-old-space-size=4096'
 
     - name: Restore dynamic routes
       run: node scripts/restore-dynamic-routes.js
