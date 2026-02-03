@@ -5,24 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack - Strict parameter handling
+        // GitHub Pages SPA redirect hack - STRICT ABSOLUTE PATH REDIRECT
         (function() {
-            console.log('=== 404.html STRICT PARAMETER REDIRECT ===');
+            console.log('=== 404.html STRICT ABSOLUTE PATH REDIRECT ===');
             
             var path = window.location.pathname;
-            var search = window.location.search;
-            var hash = window.location.hash;
-            
             console.log('Original path:', path);
             
             // Remove the /nextjsproject prefix if present
             if (path.startsWith('/nextjsproject')) {
                 path = path.replace('/nextjsproject', '');
-                console.log('After removing base path:', path);
             }
             
-            // Handle nested path errors like /learning/html/learning/html/testing
-            // Extract the correct path pattern: /learning/category/post-slug
+            // Function to extract the correct path pattern
+            function extractCorrectPath(path) {
+                console.log('Extracting correct path from:', path);
+                
+                // Handle GitHub Pages repository name duplication
+                if (path.includes('/nextjsproject/nextjsproject/')) {
+                    console.log('Detected repository name duplication');
+                    path = path.replace('/nextjsproject/nextjsproject/', '/nextjsproject/');
+                    console.log('After fixing duplication:', path);
+                }
+                
+                // Remove leading /nextjsproject if still present (for clean path)
+                if (path.startsWith('/nextjsproject/')) {
+                    path = path.replace('/nextjsproject', '');
+                    console.log('Cleaned path for parameter:', path);
+                }
+                
+                // Handle nested learning paths
+                if (path.includes('/learning/')) {
+                    var learningParts = path.split('/learning/');
+                    if (learningParts.length > 2) {
+                        console.log('Detected nested learning path:', learningParts);
+                        // Take the last valid learning path
+                        var lastLearningIndex = path.lastIndexOf('/learning/');
+                        path = path.substring(lastLearningIndex);
+                        console.log('Extracted last learning path:', path);
+                    }
+                }
+                
+                // Ensure path starts with /
+                if (!path.startsWith('/')) {
+                    path = '/' + path;
+                    console.log('Added leading slash:', path);
+                }
+                
+                console.log('Final extracted path:', path);
+                return path;
+            }
+            
             var correctedPath = extractCorrectPath(path);
             console.log('Corrected path:', correctedPath);
             
@@ -30,90 +63,42 @@
             correctedPath = correctedPath.replace(/\/+$/, '');
             console.log('Final path (no trailing slash):', correctedPath);
             
-            // Strict parameter format: ?p= + encoded path
+            // STRICT ABSOLUTE PATH: Must use /nextjsproject/index.html for GitHub Pages
             var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(correctedPath);
-            console.log('Redirect URL with strict parameter:', redirectUrl);
+            console.log('STRICT ABSOLUTE redirect URL:', redirectUrl);
             
             // Force immediate redirect
-            console.log('REDIRECTING WITH STRICT PARAMETER...');
+            console.log('REDIRECTING WITH STRICT ABSOLUTE PATH...');
             window.location.replace(redirectUrl);
         })();
-        
-        // Function to extract correct path from nested paths
-        function extractCorrectPath(path) {
-            // Handle cases like /learning/html/learning/html/testing
-            // Extract the first valid pattern: /learning/category/slug
-            var parts = path.split('/').filter(function(part) { return part.length > 0; });
-            console.log('Path parts:', parts);
-            
-            if (parts.length >= 3 && parts[0] === 'learning') {
-                // Found valid pattern: /learning/category/slug
-                var result = '/' + parts.slice(0, 3).join('/');
-                console.log('Extracted valid pattern:', result);
-                return result;
-            } else if (parts.length >= 2 && parts[0] === 'learning') {
-                // Fallback to learning/category
-                var result = '/' + parts.slice(0, 2).join('/');
-                console.log('Extracted category pattern:', result);
-                return result;
-            } else if (parts.length >= 1) {
-                // Fallback to first part
-                var result = '/' + parts[0];
-                console.log('Extracted single part:', result);
-                return result;
-            } else {
-                // Default to root
-                console.log('Defaulting to root');
-                return '/';
-            }
-        }
     </script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .container {
+            font-family: Arial, sans-serif;
             text-align: center;
-            padding: 2rem;
+            margin-top: 50px;
         }
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top: 4px solid white;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .debug-info {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            opacity: 0.7;
+        #debugInfo {
+            margin-top: 20px;
             text-align: left;
-            background: rgba(0,0,0,0.2);
-            padding: 1rem;
-            border-radius: 0.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-family: monospace;
+            font-size: 12px;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="spinner"></div>
+    <div>
         <h1>Redirecting...</h1>
-        <p>Please wait while we redirect you to the correct page.</p>
-        <div class="debug-info" id="debugInfo"></div>
+        <p>If you are not redirected automatically, <a id="redirectLink" href="#">click here</a>.</p>
+        <div id="debugInfo"></div>
     </div>
+    
     <script>
         // Show debug information
         setTimeout(function() {

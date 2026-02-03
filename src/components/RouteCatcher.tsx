@@ -55,11 +55,13 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
           }
         }
         
-        // Ensure base path for production
+        // Ensure base path for production - STRICT BASE PATH HANDLING
         if (process.env.NODE_ENV === 'production') {
           if (!targetPath.startsWith('/nextjsproject')) {
             targetPath = '/nextjsproject' + targetPath
-            console.log('Added base path:', targetPath)
+            console.log('🔧 Added /nextjsproject base path:', targetPath)
+          } else {
+            console.log('✅ Base path already present:', targetPath)
           }
         }
         
@@ -106,9 +108,13 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
             }
             
             let targetPath = extractedPath
+            // Ensure base path for production - STRICT BASE PATH HANDLING
             if (process.env.NODE_ENV === 'production') {
               if (!targetPath.startsWith('/nextjsproject')) {
                 targetPath = '/nextjsproject' + targetPath
+                console.log('🔧 Added /nextjsproject base path to fallback:', targetPath)
+              } else {
+                console.log('✅ Base path already present in fallback:', targetPath)
               }
             }
             
