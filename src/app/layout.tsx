@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import RouteCatcher from "@/components/RouteCatcher";
+import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,13 +32,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <LanguageProvider>
-          <RouteCatcher>
+          <ClientLayoutWrapper>
             <Navbar />
             <main className="flex-grow">
               {children}
             </main>
             <Footer />
-          </RouteCatcher>
+          </ClientLayoutWrapper>
         </LanguageProvider>
       </body>
     </html>

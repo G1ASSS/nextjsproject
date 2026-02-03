@@ -35,17 +35,21 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         console.log('🎯 FOUND PATH PARAMETER!')
         console.log('Path parameter value:', pathParam)
         
-        // Clean the path parameter - handle language prefixes
+        // Clean the path parameter - handle language prefixes and trailing slashes
         let targetPath = pathParam
         let detectedLanguage: string | null = null
         
+        // Remove trailing slashes to prevent duplication
+        targetPath = targetPath.replace(/\/+$/, '')
+        console.log('Path after removing trailing slashes:', targetPath)
+        
         // Detect and extract language prefix if present (e.g., /en/learning/html/post)
-        const languageMatch = pathParam.match(/^\/([a-z]{2})\//)
+        const languageMatch = targetPath.match(/^\/([a-z]{2})\//)
         if (languageMatch) {
           detectedLanguage = languageMatch[1]
           console.log('🌐 Detected language prefix:', detectedLanguage)
-          console.log('🌐 Removing language prefix from path:', pathParam)
-          targetPath = pathParam.replace(/^\/[a-z]{2}\//, '/')
+          console.log('🌐 Removing language prefix from path:', targetPath)
+          targetPath = targetPath.replace(/^\/[a-z]{2}\//, '/')
           console.log('Path after removing language prefix:', targetPath)
           
           // Set the detected language as current language
@@ -54,6 +58,10 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
             setLanguage(detectedLanguage as any)
           }
         }
+        
+        // Remove trailing slashes again after language processing
+        targetPath = targetPath.replace(/\/+$/, '')
+        console.log('Final clean path:', targetPath)
         
         // Ensure base path for production - STRICT BASE PATH HANDLING
         if (process.env.NODE_ENV === 'production') {
@@ -91,6 +99,10 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
             let extractedPath = decodeURIComponent(match[1])
             console.log('🎯 EXTRACTED PATH:', extractedPath)
             
+            // Remove trailing slashes first
+            extractedPath = extractedPath.replace(/\/+$/, '')
+            console.log('Extracted path after removing trailing slashes:', extractedPath)
+            
             // Detect and extract language prefix from extracted path
             const extractedLanguageMatch = extractedPath.match(/^\/([a-z]{2})\//)
             if (extractedLanguageMatch) {
@@ -106,6 +118,10 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
                 setLanguage(extractedLanguage as any)
               }
             }
+            
+            // Remove trailing slashes again after language processing
+            extractedPath = extractedPath.replace(/\/+$/, '')
+            console.log('Final extracted path:', extractedPath)
             
             let targetPath = extractedPath
             // Ensure base path for production - STRICT BASE PATH HANDLING
