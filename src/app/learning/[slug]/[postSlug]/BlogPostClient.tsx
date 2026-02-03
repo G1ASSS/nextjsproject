@@ -81,12 +81,13 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
         // Add cache-busting parameters to prevent GitHub Pages caching
         const cacheBuster = `&_t=${Date.now()}&_r=${Math.random()}`
         
-        console.log('=== CLIENT-SIDE POST FETCH (404 HANDLING) ===')
+        console.log('=== AGGRESSIVE CLIENT-SIDE POST FETCH (404 HANDLING) ===')
         console.log('Fetching latest post data for:', post.slug)
         console.log('Effective locale:', effectiveLocale)
         console.log('Cache-busting:', cacheBuster)
-        console.log('This handles posts that were originally 404s')
+        console.log('This AGGRESSIVELY handles posts that were originally 404s')
         console.log('Current pathname:', pathname)
+        console.log('Window URL:', typeof window !== 'undefined' ? window.location.href : 'N/A')
         
         // First try to fetch by slug (works for new posts and 404 redirects)
         const { data: latestPost, error } = await supabase
@@ -100,16 +101,16 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           .single()
 
         if (latestPost && !error) {
-          console.log('=== POST FETCH SUCCESS (404 HANDLED) ===')
+          console.log('🎯 AGGRESSIVE POST FETCH SUCCESS (404 HANDLED) ===')
           console.log('Fetched latest post:', latestPost.title)
           console.log('Post language:', latestPost.language)
           console.log('Post updated_at:', latestPost.updated_at)
           console.log('Post category:', latestPost.categories?.slug)
-          console.log('This post was originally a 404 but now loaded successfully')
+          console.log('✅ This post was originally a 404 but now loaded successfully!')
           
           setCurrentPost(latestPost)
         } else {
-          console.log('=== POST FETCH ERROR ===')
+          console.log('❌ AGGRESSIVE POST FETCH ERROR ===')
           console.log('Error:', error)
           console.log('This might be a new slug not in static build or 404 redirect failed')
           
@@ -126,11 +127,11 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
             .single()
 
           if (fallbackPost && !fallbackError) {
-            console.log('=== FALLBACK POST FETCH SUCCESS ===')
+            console.log('🎯 AGGRESSIVE FALLBACK POST FETCH SUCCESS ===')
             console.log('Found post with fallback:', fallbackPost.title)
             setCurrentPost(fallbackPost)
           } else {
-            console.log('=== ALL FETCH ATTEMPTS FAILED ===')
+            console.log('❌ ALL AGGRESSIVE FETCH ATTEMPTS FAILED ===')
             console.log('Fallback error:', fallbackError)
             console.log('This post may not exist in Supabase or 404 handling failed')
             
@@ -145,19 +146,39 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
               .eq('status', 'published')
 
             if (flexiblePost && flexiblePost.length > 0 && !flexibleError) {
-              console.log('=== FLEXIBLE POST FETCH SUCCESS ===')
+              console.log('🎯 AGGRESSIVE FLEXIBLE POST FETCH SUCCESS ===')
               console.log('Found post with flexible search:', flexiblePost[0].title)
               setCurrentPost(flexiblePost[0])
             } else {
-              console.log('=== FLEXIBLE FETCH ALSO FAILED ===')
+              console.log('❌ AGGRESSIVE FLEXIBLE FETCH ALSO FAILED ===')
               console.log('Flexible error:', flexibleError)
               console.log('Post may not exist in Supabase at all')
-              // Keep the original post if all fetches fail
+              
+              // Last resort: Try to fetch by partial match
+              const { data: partialPost, error: partialError } = await supabase
+                .from('blogs')
+                .select(`
+                  *,
+                  categories(id, name, slug)
+                `)
+                .ilike('slug', `%${post.slug}%`)
+                .eq('status', 'published')
+                .limit(1)
+                .single()
+
+              if (partialPost && !partialError) {
+                console.log('🎯 AGGRESSIVE PARTIAL MATCH SUCCESS ===')
+                console.log('Found post with partial match:', partialPost.title)
+                setCurrentPost(partialPost)
+              } else {
+                console.log('❌ ALL ATTEMPTS FAILED - KEEPING ORIGINAL POST ===')
+                // Keep the original post if all fetches fail
+              }
             }
           }
         }
       } catch (err) {
-        console.error('Error fetching latest post (404 handling):', err)
+        console.error('❌ Error in aggressive post fetch (404 handling):', err)
       } finally {
         setLoading(false)
       }
