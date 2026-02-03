@@ -5,70 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack - STRICT ABSOLUTE PATH REDIRECT
+        // GitHub Pages SPA redirect hack - SIMPLE DIRECT REDIRECT
         (function() {
-            console.log('=== 404.html STRICT ABSOLUTE PATH REDIRECT ===');
+            console.log('=== 404.html SIMPLE DIRECT REDIRECT ===');
             
-            var path = window.location.pathname;
-            console.log('Original path:', path);
+            var originalPath = window.location.pathname;
+            console.log('Original path:', originalPath);
             
             // Remove the /nextjsproject prefix if present
-            if (path.startsWith('/nextjsproject')) {
-                path = path.replace('/nextjsproject', '');
+            var cleanPath = originalPath;
+            if (cleanPath.startsWith('/nextjsproject')) {
+                cleanPath = cleanPath.replace('/nextjsproject', '');
+                console.log('After removing base path:', cleanPath);
             }
             
-            // Function to extract the correct path pattern
-            function extractCorrectPath(path) {
-                console.log('Extracting correct path from:', path);
-                
-                // Handle GitHub Pages repository name duplication
-                if (path.includes('/nextjsproject/nextjsproject/')) {
-                    console.log('Detected repository name duplication');
-                    path = path.replace('/nextjsproject/nextjsproject/', '/nextjsproject/');
-                    console.log('After fixing duplication:', path);
-                }
-                
-                // Remove leading /nextjsproject if still present (for clean path)
-                if (path.startsWith('/nextjsproject/')) {
-                    path = path.replace('/nextjsproject', '');
-                    console.log('Cleaned path for parameter:', path);
-                }
-                
-                // Handle nested learning paths
-                if (path.includes('/learning/')) {
-                    var learningParts = path.split('/learning/');
-                    if (learningParts.length > 2) {
-                        console.log('Detected nested learning path:', learningParts);
-                        // Take the last valid learning path
-                        var lastLearningIndex = path.lastIndexOf('/learning/');
-                        path = path.substring(lastLearningIndex);
-                        console.log('Extracted last learning path:', path);
-                    }
-                }
-                
-                // Ensure path starts with /
-                if (!path.startsWith('/')) {
-                    path = '/' + path;
-                    console.log('Added leading slash:', path);
-                }
-                
-                console.log('Final extracted path:', path);
-                return path;
-            }
+            // Remove trailing slashes
+            cleanPath = cleanPath.replace(/\/+$/, '');
+            console.log('Clean path for parameter:', cleanPath);
             
-            var correctedPath = extractCorrectPath(path);
-            console.log('Corrected path:', correctedPath);
+            // Create redirect URL with absolute path
+            var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(cleanPath);
+            console.log('Redirect URL:', redirectUrl);
             
-            // Remove trailing slashes to prevent duplication
-            correctedPath = correctedPath.replace(/\/+$/, '');
-            console.log('Final path (no trailing slash):', correctedPath);
-            
-            // STRICT ABSOLUTE PATH: Must use /nextjsproject/index.html for GitHub Pages
-            var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(correctedPath);
-            console.log('STRICT ABSOLUTE redirect URL:', redirectUrl);
-            
-            // Force immediate redirect
-            console.log('REDIRECTING WITH STRICT ABSOLUTE PATH...');
+            // Redirect immediately
+            console.log('REDIRECTING...');
             window.location.replace(redirectUrl);
         })();
     </script>
@@ -102,11 +62,20 @@
     <script>
         // Show debug information
         setTimeout(function() {
+            var originalPath = window.location.pathname;
+            var cleanPath = originalPath;
+            if (cleanPath.startsWith('/nextjsproject')) {
+                cleanPath = cleanPath.replace('/nextjsproject', '');
+            }
+            cleanPath = cleanPath.replace(/\/+$/, '');
+            
             document.getElementById('debugInfo').innerHTML = 
-                'Original path: ' + window.location.pathname + '<br>' +
-                'Base path: /nextjsproject<br>' +
-                'Using strict ?p= parameter format...<br>' +
+                'Original path: ' + originalPath + '<br>' +
+                'Clean path: ' + cleanPath + '<br>' +
+                'Redirect URL: /nextjsproject/index.html?p=' + encodeURIComponent(cleanPath) + '<br>' +
                 'Check browser console for detailed debugging';
+                
+            document.getElementById('redirectLink').href = '/nextjsproject/index.html?p=' + encodeURIComponent(cleanPath);
         }, 100);
     </script>
 </body>
