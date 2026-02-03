@@ -33,7 +33,9 @@ jobs:
         echo "🚀 Workflow triggered by: ${{ github.event_name }}"
         if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
           echo "📦 Supabase update detected!"
+          echo "📋 Event type: ${{ github.event.event_type }}"
           echo "📋 Event data: ${{ github.event.client_payload }}"
+          echo "📋 Full event: ${{ toJson(github.event) }}"
         elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           echo "🔧 Manual workflow dispatch"
         else
