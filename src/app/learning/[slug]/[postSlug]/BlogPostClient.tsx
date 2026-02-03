@@ -81,13 +81,14 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
         // Add cache-busting parameters to prevent GitHub Pages caching
         const cacheBuster = `&_t=${Date.now()}&_r=${Math.random()}`
         
-        console.log('=== CLIENT-SIDE POST FETCH ===')
+        console.log('=== CLIENT-SIDE POST FETCH (404 HANDLING) ===')
         console.log('Fetching latest post data for:', post.slug)
         console.log('Effective locale:', effectiveLocale)
         console.log('Cache-busting:', cacheBuster)
-        console.log('This is a real-time fetch for new slugs')
+        console.log('This handles posts that were originally 404s')
+        console.log('Current pathname:', pathname)
         
-        // First try to fetch by slug (works for new posts)
+        // First try to fetch by slug (works for new posts and 404 redirects)
         const { data: latestPost, error } = await supabase
           .from('blogs')
           .select(`
@@ -99,17 +100,18 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           .single()
 
         if (latestPost && !error) {
-          console.log('=== POST FETCH SUCCESS ===')
+          console.log('=== POST FETCH SUCCESS (404 HANDLED) ===')
           console.log('Fetched latest post:', latestPost.title)
           console.log('Post language:', latestPost.language)
           console.log('Post updated_at:', latestPost.updated_at)
           console.log('Post category:', latestPost.categories?.slug)
+          console.log('This post was originally a 404 but now loaded successfully')
           
           setCurrentPost(latestPost)
         } else {
           console.log('=== POST FETCH ERROR ===')
           console.log('Error:', error)
-          console.log('This might be a new slug not in static build')
+          console.log('This might be a new slug not in static build or 404 redirect failed')
           
           // Try fallback fetch for new posts by checking all languages
           const { data: fallbackPost, error: fallbackError } = await supabase
@@ -130,7 +132,7 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           } else {
             console.log('=== ALL FETCH ATTEMPTS FAILED ===')
             console.log('Fallback error:', fallbackError)
-            console.log('This post may not exist in Supabase')
+            console.log('This post may not exist in Supabase or 404 handling failed')
             
             // For completely new posts, try a more flexible search
             const { data: flexiblePost, error: flexibleError } = await supabase
@@ -149,12 +151,13 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
             } else {
               console.log('=== FLEXIBLE FETCH ALSO FAILED ===')
               console.log('Flexible error:', flexibleError)
+              console.log('Post may not exist in Supabase at all')
               // Keep the original post if all fetches fail
             }
           }
         }
       } catch (err) {
-        console.error('Error fetching latest post:', err)
+        console.error('Error fetching latest post (404 handling):', err)
       } finally {
         setLoading(false)
       }
@@ -163,7 +166,7 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
     // Set mounted state and fetch latest data
     setMounted(true)
     fetchLatestPost()
-  }, [post?.slug, effectiveLocale, mounted])
+  }, [post?.slug, effectiveLocale, mounted, pathname])
 
   console.log('=== DYNAMIC BLOG POST CLIENT DEBUG ===')
   console.log('Pathname:', pathname)

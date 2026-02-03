@@ -18,21 +18,17 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
   }, [])
 
   useEffect(() => {
-    // Handle ?p= parameter from 404.html redirect ONLY after mounted
+    // Strictly listen for 'p' parameter from 404.html redirect
     if (typeof window !== 'undefined' && mounted) {
       const url = new URL(window.location.href)
       const pathParam = url.searchParams.get('p')
       
       if (pathParam) {
-        console.log('=== ROUTE CATCHER DEBUG ===')
+        console.log('=== ROUTE CATCHER STRICT INTERCEPTION ===')
         console.log('Path parameter found:', pathParam)
         console.log('Current pathname:', pathname)
         console.log('Mounted:', mounted)
         console.log('Environment:', process.env.NODE_ENV)
-        
-        // Clean the URL by removing the ?p= parameter
-        url.searchParams.delete('p')
-        const cleanUrl = url.pathname + url.search + url.hash
         
         // Ensure the path has the correct base path for Next.js router
         let finalPath = pathParam
@@ -45,15 +41,21 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         }
         
         console.log('Final path for router:', finalPath)
+        
+        // Clean the URL by removing the ?p= parameter
+        url.searchParams.delete('p')
+        const cleanUrl = url.pathname + url.search + url.hash
+        
         console.log('Clean URL will be:', cleanUrl)
         
-        // Navigate to the actual path
-        router.push(finalPath)
+        // Immediate router.replace with pathParam
+        console.log('IMMEDIATE ROUTER REPLACE...')
+        router.replace(finalPath)
         
-        // Replace URL history to clean up the ?p= parameter
+        // Clean URL history immediately
         window.history.replaceState({}, '', cleanUrl)
         
-        console.log('=== END ROUTE CATCHER DEBUG ===')
+        console.log('=== END STRICT INTERCEPTION ===')
       }
     }
   }, [router, pathname, mounted])

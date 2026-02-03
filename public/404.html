@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack - Permanent solution with index.html
+        // GitHub Pages SPA redirect hack - Strict parameter handling
         (function() {
+            console.log('=== 404.html STRICT PARAMETER REDIRECT ===');
+            
             var path = window.location.pathname;
             var search = window.location.search;
             var hash = window.location.hash;
             
-            console.log('=== 404.html INDEX.HTML REDIRECT ===');
             console.log('Original path:', path);
             
             // Remove the /nextjsproject prefix if present
@@ -29,12 +30,12 @@
             correctedPath = correctedPath.replace(/\/+$/, '');
             console.log('Final path (no trailing slash):', correctedPath);
             
-            // Redirect to index.html with path parameter
-            var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(correctedPath) + search + hash;
-            console.log('Redirect URL to index.html:', redirectUrl);
+            // Strict parameter format: ?p= + encoded path
+            var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(correctedPath);
+            console.log('Redirect URL with strict parameter:', redirectUrl);
             
-            // Force immediate redirect to index.html
-            console.log('REDIRECTING TO index.html WITH PATH PARAMETER...');
+            // Force immediate redirect
+            console.log('REDIRECTING WITH STRICT PARAMETER...');
             window.location.replace(redirectUrl);
         })();
         
@@ -119,7 +120,7 @@
             document.getElementById('debugInfo').innerHTML = 
                 'Original path: ' + window.location.pathname + '<br>' +
                 'Base path: /nextjsproject<br>' +
-                'Redirecting to index.html with path parameter...<br>' +
+                'Using strict ?p= parameter format...<br>' +
                 'Check browser console for detailed debugging';
         }, 100);
     </script>
