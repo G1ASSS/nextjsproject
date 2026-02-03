@@ -78,18 +78,12 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
       
       setLoading(true)
       try {
-        // Add cache-busting parameters to prevent GitHub Pages caching
-        const cacheBuster = `&_t=${Date.now()}&_r=${Math.random()}`
-        
-        console.log('=== AGGRESSIVE CLIENT-SIDE POST FETCH (404 HANDLING) ===')
-        console.log('Fetching latest post data for:', post.slug)
-        console.log('Effective locale:', effectiveLocale)
-        console.log('Cache-busting:', cacheBuster)
-        console.log('This AGGRESSIVELY handles posts that were originally 404s')
+        console.log('=== SIMPLE POST FETCH FOR NEW POSTS ===')
+        console.log('Fetching post data for:', post.slug)
         console.log('Current pathname:', pathname)
         console.log('Window URL:', typeof window !== 'undefined' ? window.location.href : 'N/A')
         
-        // First try to fetch by slug (works for new posts and 404 redirects)
+        // Simple direct fetch from Supabase
         const { data: latestPost, error } = await supabase
           .from('blogs')
           .select(`
@@ -101,21 +95,17 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           .single()
 
         if (latestPost && !error) {
-          console.log('🎯 AGGRESSIVE POST FETCH SUCCESS (404 HANDLED) ===')
-          console.log('Fetched latest post:', latestPost.title)
-          console.log('Post language:', latestPost.language)
-          console.log('Post updated_at:', latestPost.updated_at)
-          console.log('Post category:', latestPost.categories?.slug)
-          console.log('✅ This post was originally a 404 but now loaded successfully!')
-          
+          console.log('✅ POST FOUND IN SUPABASE!')
+          console.log('Title:', latestPost.title)
+          console.log('Category:', latestPost.categories?.slug)
+          console.log('Language:', latestPost.language)
           setCurrentPost(latestPost)
         } else {
-          console.log('❌ AGGRESSIVE POST FETCH ERROR ===')
+          console.log('❌ POST NOT FOUND WITH SINGLE QUERY')
           console.log('Error:', error)
-          console.log('This might be a new slug not in static build or 404 redirect failed')
           
-          // Try fallback fetch for new posts by checking all languages
-          const { data: fallbackPost, error: fallbackError } = await supabase
+          // Try without .single() to get array
+          const { data: postsArray, error: arrayError } = await supabase
             .from('blogs')
             .select(`
               *,
@@ -123,62 +113,20 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
             `)
             .eq('slug', post.slug)
             .eq('status', 'published')
-            .limit(1)
-            .single()
 
-          if (fallbackPost && !fallbackError) {
-            console.log('🎯 AGGRESSIVE FALLBACK POST FETCH SUCCESS ===')
-            console.log('Found post with fallback:', fallbackPost.title)
-            setCurrentPost(fallbackPost)
+          if (postsArray && postsArray.length > 0 && !arrayError) {
+            console.log('✅ POST FOUND WITH ARRAY QUERY!')
+            console.log('Title:', postsArray[0].title)
+            setCurrentPost(postsArray[0])
           } else {
-            console.log('❌ ALL AGGRESSIVE FETCH ATTEMPTS FAILED ===')
-            console.log('Fallback error:', fallbackError)
-            console.log('This post may not exist in Supabase or 404 handling failed')
-            
-            // For completely new posts, try a more flexible search
-            const { data: flexiblePost, error: flexibleError } = await supabase
-              .from('blogs')
-              .select(`
-                *,
-                categories(id, name, slug)
-              `)
-              .eq('slug', post.slug)
-              .eq('status', 'published')
-
-            if (flexiblePost && flexiblePost.length > 0 && !flexibleError) {
-              console.log('🎯 AGGRESSIVE FLEXIBLE POST FETCH SUCCESS ===')
-              console.log('Found post with flexible search:', flexiblePost[0].title)
-              setCurrentPost(flexiblePost[0])
-            } else {
-              console.log('❌ AGGRESSIVE FLEXIBLE FETCH ALSO FAILED ===')
-              console.log('Flexible error:', flexibleError)
-              console.log('Post may not exist in Supabase at all')
-              
-              // Last resort: Try to fetch by partial match
-              const { data: partialPost, error: partialError } = await supabase
-                .from('blogs')
-                .select(`
-                  *,
-                  categories(id, name, slug)
-                `)
-                .ilike('slug', `%${post.slug}%`)
-                .eq('status', 'published')
-                .limit(1)
-                .single()
-
-              if (partialPost && !partialError) {
-                console.log('🎯 AGGRESSIVE PARTIAL MATCH SUCCESS ===')
-                console.log('Found post with partial match:', partialPost.title)
-                setCurrentPost(partialPost)
-              } else {
-                console.log('❌ ALL ATTEMPTS FAILED - KEEPING ORIGINAL POST ===')
-                // Keep the original post if all fetches fail
-              }
-            }
+            console.log('❌ POST NOT FOUND AT ALL')
+            console.log('Array error:', arrayError)
+            console.log('This post may not exist in Supabase')
+            // Keep original post as fallback
           }
         }
       } catch (err) {
-        console.error('❌ Error in aggressive post fetch (404 handling):', err)
+        console.error('❌ ERROR FETCHING POST:', err)
       } finally {
         setLoading(false)
       }
@@ -187,7 +135,7 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
     // Set mounted state and fetch latest data
     setMounted(true)
     fetchLatestPost()
-  }, [post?.slug, effectiveLocale, mounted, pathname])
+  }, [post?.slug, mounted, pathname])
 
   console.log('=== DYNAMIC BLOG POST CLIENT DEBUG ===')
   console.log('Pathname:', pathname)

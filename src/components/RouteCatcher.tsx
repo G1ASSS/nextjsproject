@@ -11,7 +11,6 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
-  const [intercepted, setIntercepted] = useState(false)
 
   useEffect(() => {
     // Wait for component to mount to avoid hydration mismatches
@@ -19,84 +18,73 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
   }, [])
 
   useEffect(() => {
-    // Aggressively listen for 'p' parameter from 404.html redirect
-    if (typeof window !== 'undefined' && mounted && !intercepted) {
+    // Simple and direct parameter interception
+    if (typeof window !== 'undefined' && mounted) {
       const url = new URL(window.location.href)
       const pathParam = url.searchParams.get('p')
       
-      console.log('=== ROUTE CATCHER AGGRESSIVE INTERCEPTION ===')
-      console.log('URL:', window.location.href)
-      console.log('Path parameter found:', pathParam)
-      console.log('Current pathname:', pathname)
-      console.log('Mounted:', mounted)
-      console.log('Intercepted:', intercepted)
-      console.log('Environment:', process.env.NODE_ENV)
-      console.log('All search params:', Object.fromEntries(url.searchParams))
+      console.log('=== SIMPLE ROUTE CATCHER ===')
+      console.log('Full URL:', window.location.href)
+      console.log('Pathname:', pathname)
+      console.log('Search params:', url.search)
+      console.log('Path parameter (p):', pathParam)
       
       if (pathParam) {
-        console.log('🎯 PARAMETER DETECTED - IMMEDIATE ACTION!')
+        console.log('🎯 FOUND PATH PARAMETER!')
+        console.log('Path parameter value:', pathParam)
         
-        // Ensure the path has the correct base path for Next.js router
-        let finalPath = pathParam
+        // Clean the path parameter
+        let targetPath = pathParam
         
-        // Always ensure base path in production
+        // Ensure base path for production
         if (process.env.NODE_ENV === 'production') {
-          if (!pathParam.startsWith('/nextjsproject')) {
-            finalPath = '/nextjsproject' + pathParam
-            console.log('Added base path:', finalPath)
+          if (!targetPath.startsWith('/nextjsproject')) {
+            targetPath = '/nextjsproject' + targetPath
+            console.log('Added base path:', targetPath)
           }
         }
         
-        console.log('Final path for router:', finalPath)
+        console.log('Final target path:', targetPath)
         
-        // Clean the URL by removing the ?p= parameter
-        url.searchParams.delete('p')
-        const cleanUrl = url.pathname + url.search + url.hash
+        // Navigate immediately
+        console.log('🚀 NAVIGATING TO:', targetPath)
+        router.push(targetPath)
         
-        console.log('Clean URL will be:', cleanUrl)
-        
-        // Mark as intercepted to prevent duplicate actions
-        setIntercepted(true)
-        
-        // Immediate router.replace with pathParam
-        console.log('🚀 IMMEDIATE ROUTER REPLACE...')
-        router.replace(finalPath)
-        
-        // Clean URL history immediately
+        // Clean the URL
+        const cleanUrl = window.location.origin + targetPath
+        console.log('🧹 Cleaning URL to:', cleanUrl)
         window.history.replaceState({}, '', cleanUrl)
         
-        console.log('✅ INTERCEPTION COMPLETE - URL CLEANED')
-        console.log('=== END AGGRESSIVE INTERCEPTION ===')
+        console.log('✅ ROUTE CATCHER COMPLETE')
       } else {
-        console.log('❌ No parameter found - checking again...')
+        console.log('❌ No path parameter found')
         
-        // Fallback: Check if we're on index.html with parameters
+        // Check if we're on the index page with search params
         if (pathname === '/' && url.search) {
-          console.log('🔄 Fallback: On index.html with search params')
-          console.log('Search params:', url.search)
+          console.log('� Checking index page for hidden parameters...')
+          console.log('Raw search string:', url.search)
           
-          // Try to extract p parameter manually
-          const pMatch = url.search.match(/[?&]p=([^&]+)/)
-          if (pMatch) {
-            const fallbackPath = decodeURIComponent(pMatch[1])
-            console.log('🎯 FALLBACK PARAMETER FOUND:', fallbackPath)
+          // Manual extraction as fallback
+          const match = url.search.match(/[?&]p=([^&]+)/)
+          if (match) {
+            const extractedPath = decodeURIComponent(match[1])
+            console.log('🎯 EXTRACTED PATH:', extractedPath)
             
-            let finalPath = fallbackPath
+            let targetPath = extractedPath
             if (process.env.NODE_ENV === 'production') {
-              if (!fallbackPath.startsWith('/nextjsproject')) {
-                finalPath = '/nextjsproject' + fallbackPath
+              if (!targetPath.startsWith('/nextjsproject')) {
+                targetPath = '/nextjsproject' + targetPath
               }
             }
             
-            setIntercepted(true)
-            console.log('🚀 FALLBACK ROUTER REPLACE...')
-            router.replace(finalPath)
-            window.history.replaceState({}, '', finalPath)
+            console.log('🚀 FALLBACK NAVIGATING TO:', targetPath)
+            router.push(targetPath)
+            window.history.replaceState({}, '', window.location.origin + targetPath)
           }
         }
       }
     }
-  }, [router, pathname, mounted, intercepted])
+  }, [router, pathname, mounted])
 
   return <>{children}</>
 }
