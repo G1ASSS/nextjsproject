@@ -22,6 +22,14 @@ const nextConfig = {
       },
     ],
   },
+  // Exclude Supabase functions from Next.js build
+  outputFileTracingExcludes: {
+    '*': [
+      './supabase/**/*',
+    ],
+  },
+  // Transpile packages to handle Deno imports
+  transpilePackages: [],
 }
 
 module.exports = nextConfig

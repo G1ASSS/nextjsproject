@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# supabase
+# Note: Keep the functions directory but ignore build artifacts
+/supabase/functions/.deno
+/supabase/functions/node_modules
