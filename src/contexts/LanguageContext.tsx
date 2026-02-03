@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 export type Language = 'en' | 'my' | 'th' | 'es' | 'zh'
 
@@ -201,11 +201,60 @@ interface LanguageProviderProps {
   children: ReactNode
 }
 
+// Get language from localStorage with fallback
+const getStoredLanguage = (): Language => {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('selectedLanguage')
+      if (stored && ['en', 'my', 'th', 'es', 'zh'].includes(stored)) {
+        console.log('📦 Loaded language from localStorage:', stored)
+        return stored as Language
+      }
+    } catch (error) {
+      console.error('Error reading localStorage:', error)
+    }
+  }
+  console.log('📦 No stored language, using fallback: en')
+  return 'en'
+}
+
+// Save language to localStorage
+const saveLanguageToStorage = (language: Language) => {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('selectedLanguage', language)
+      console.log('💾 Saved language to localStorage:', language)
+    } catch (error) {
+      console.error('Error saving to localStorage:', error)
+    }
+  }
+}
+
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('en')
+  // Initialize from localStorage, NOT hardcoded 'en'
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
+    return getStoredLanguage()
+  })
+
+  // Sync with localStorage on mount and language changes
+  useEffect(() => {
+    const storedLanguage = getStoredLanguage()
+    if (storedLanguage !== currentLanguage) {
+      console.log('🔄 Syncing language with localStorage:', storedLanguage)
+      setCurrentLanguage(storedLanguage)
+    }
+  }, [])
 
   const setLanguage = (language: Language) => {
+    console.log('=== LANGUAGE CONTEXT UPDATE ===')
+    console.log('Previous language:', currentLanguage)
+    console.log('New language:', language)
+    
     setCurrentLanguage(language)
+    saveLanguageToStorage(language)
+    
+    console.log('✅ Language updated and saved to localStorage')
+    console.log('=== END LANGUAGE CONTEXT UPDATE ===')
   }
   const t = (key: string, options?: { defaultValue?: string; [key: string]: any }): string => {
     console.log('=== TRANSLATION DEBUG ===')

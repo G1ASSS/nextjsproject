@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface RouteCatcherProps {
   children: React.ReactNode
@@ -11,6 +12,7 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
+  const { setLanguage } = useLanguage()
 
   useEffect(() => {
     // Wait for component to mount to avoid hydration mismatches
@@ -23,7 +25,7 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
       const url = new URL(window.location.href)
       const pathParam = url.searchParams.get('p')
       
-      console.log('=== ROUTE CATCHER WITH LANGUAGE SUPPORT ===')
+      console.log('=== ROUTE CATCHER WITH LANGUAGE DETECTION ===')
       console.log('Full URL:', window.location.href)
       console.log('Pathname:', pathname)
       console.log('Search params:', url.search)
@@ -35,12 +37,22 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         
         // Clean the path parameter - handle language prefixes
         let targetPath = pathParam
+        let detectedLanguage: string | null = null
         
-        // Remove language prefix if present (e.g., /en/learning/html/post)
-        if (targetPath.match(/^\/[a-z]{2}\//)) {
-          console.log('🌐 Detected language prefix, removing:', targetPath)
-          targetPath = targetPath.replace(/^\/[a-z]{2}\//, '/')
+        // Detect and extract language prefix if present (e.g., /en/learning/html/post)
+        const languageMatch = pathParam.match(/^\/([a-z]{2})\//)
+        if (languageMatch) {
+          detectedLanguage = languageMatch[1]
+          console.log('🌐 Detected language prefix:', detectedLanguage)
+          console.log('🌐 Removing language prefix from path:', pathParam)
+          targetPath = pathParam.replace(/^\/[a-z]{2}\//, '/')
           console.log('Path after removing language prefix:', targetPath)
+          
+          // Set the detected language as current language
+          if (['en', 'my', 'th', 'es', 'zh'].includes(detectedLanguage)) {
+            console.log('🌐 Setting detected language as current language:', detectedLanguage)
+            setLanguage(detectedLanguage as any)
+          }
         }
         
         // Ensure base path for production
@@ -77,11 +89,20 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
             let extractedPath = decodeURIComponent(match[1])
             console.log('🎯 EXTRACTED PATH:', extractedPath)
             
-            // Remove language prefix if present
-            if (extractedPath.match(/^\/[a-z]{2}\//)) {
+            // Detect and extract language prefix from extracted path
+            const extractedLanguageMatch = extractedPath.match(/^\/([a-z]{2})\//)
+            if (extractedLanguageMatch) {
+              const extractedLanguage = extractedLanguageMatch[1]
+              console.log('🌐 Detected language prefix in extracted path:', extractedLanguage)
               console.log('🌐 Removing language prefix from extracted path:', extractedPath)
               extractedPath = extractedPath.replace(/^\/[a-z]{2}\//, '/')
               console.log('Path after removing language prefix:', extractedPath)
+              
+              // Set the detected language as current language
+              if (['en', 'my', 'th', 'es', 'zh'].includes(extractedLanguage)) {
+                console.log('🌐 Setting detected language as current language:', extractedLanguage)
+                setLanguage(extractedLanguage as any)
+              }
             }
             
             let targetPath = extractedPath
@@ -98,7 +119,7 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         }
       }
     }
-  }, [router, pathname, mounted])
+  }, [router, pathname, mounted, setLanguage])
 
   return <>{children}</>
 }

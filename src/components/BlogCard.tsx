@@ -92,41 +92,24 @@ export default function BlogCard({
           ) : null}
         </div>
         
-        {/* View Details Button - Smart routing based on environment */}
+        {/* View Details Button - Smart routing with language preservation */}
         {linkUrl ? (
-          <>
-            {process.env.NODE_ENV === 'development' ? (
-              // Local development - use Next.js routing
-              <Link href={linkUrl} className="block">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full px-4 py-2 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors mt-4"
-                >
-                  {linkText}
-                </motion.button>
-              </Link>
-            ) : (
-              // Production - use strict absolute links with repository name
-              <a 
-                href={`/nextjsproject${linkUrl}`}
-                className="block"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // Use absolute path without hash for GitHub Pages
-                  window.location.href = `/nextjsproject${linkUrl}`;
-                }}
-              >
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full px-4 py-2 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors mt-4"
-                >
-                  {linkText}
-                </motion.button>
-              </a>
-            )}
-          </>
+          <Link 
+            href={linkUrl} 
+            className="block"
+            onClick={(e) => {
+              // Prevent language reset during navigation
+              console.log('🔗 BlogCard Link clicked, preserving language state')
+            }}
+          >
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-4 py-2 bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 rounded-lg font-medium hover:bg-cyan-500/30 hover:border-cyan-400 transition-colors mt-4"
+            >
+              {linkText}
+            </motion.button>
+          </Link>
         ) : (
           <motion.button
             whileHover={{ scale: 1.02 }}
