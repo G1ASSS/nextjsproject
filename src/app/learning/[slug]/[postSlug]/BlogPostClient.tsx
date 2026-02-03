@@ -85,6 +85,7 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
         console.log('Fetching latest post data for:', post.slug)
         console.log('Effective locale:', effectiveLocale)
         console.log('Cache-busting:', cacheBuster)
+        console.log('This is a real-time fetch for new slugs')
         
         // First try to fetch by slug (works for new posts)
         const { data: latestPost, error } = await supabase
@@ -129,7 +130,27 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           } else {
             console.log('=== ALL FETCH ATTEMPTS FAILED ===')
             console.log('Fallback error:', fallbackError)
-            // Keep the original post if all fetches fail
+            console.log('This post may not exist in Supabase')
+            
+            // For completely new posts, try a more flexible search
+            const { data: flexiblePost, error: flexibleError } = await supabase
+              .from('blogs')
+              .select(`
+                *,
+                categories(id, name, slug)
+              `)
+              .eq('slug', post.slug)
+              .eq('status', 'published')
+
+            if (flexiblePost && flexiblePost.length > 0 && !flexibleError) {
+              console.log('=== FLEXIBLE POST FETCH SUCCESS ===')
+              console.log('Found post with flexible search:', flexiblePost[0].title)
+              setCurrentPost(flexiblePost[0])
+            } else {
+              console.log('=== FLEXIBLE FETCH ALSO FAILED ===')
+              console.log('Flexible error:', flexibleError)
+              // Keep the original post if all fetches fail
+            }
           }
         }
       } catch (err) {

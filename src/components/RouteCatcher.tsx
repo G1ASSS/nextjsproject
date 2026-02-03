@@ -28,6 +28,7 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         console.log('Path parameter found:', pathParam)
         console.log('Current pathname:', pathname)
         console.log('Mounted:', mounted)
+        console.log('Environment:', process.env.NODE_ENV)
         
         // Clean the URL by removing the ?p= parameter
         url.searchParams.delete('p')
@@ -35,8 +36,12 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         
         // Ensure the path has the correct base path for Next.js router
         let finalPath = pathParam
-        if (!pathParam.startsWith('/nextjsproject') && process.env.NODE_ENV === 'production') {
-          finalPath = '/nextjsproject' + pathParam
+        
+        // Always ensure base path in production
+        if (process.env.NODE_ENV === 'production') {
+          if (!pathParam.startsWith('/nextjsproject')) {
+            finalPath = '/nextjsproject' + pathParam
+          }
         }
         
         console.log('Final path for router:', finalPath)
