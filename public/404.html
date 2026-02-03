@@ -5,30 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        // GitHub Pages SPA redirect hack - SIMPLE DIRECT REDIRECT
+        // GitHub Pages SPA redirect hack - STRICT BASE PATH ENFORCEMENT
         (function() {
-            console.log('=== 404.html SIMPLE DIRECT REDIRECT ===');
+            console.log('=== 404.html STRICT BASE PATH ENFORCEMENT ===');
             
             var originalPath = window.location.pathname;
             console.log('Original path:', originalPath);
             
-            // Remove the /nextjsproject prefix if present
+            // Remove the /nextjsproject prefix if present for clean parameter
             var cleanPath = originalPath;
             if (cleanPath.startsWith('/nextjsproject')) {
                 cleanPath = cleanPath.replace('/nextjsproject', '');
                 console.log('After removing base path:', cleanPath);
             }
             
-            // Remove trailing slashes
+            // Remove trailing slashes to prevent duplication
             cleanPath = cleanPath.replace(/\/+$/, '');
-            console.log('Clean path for parameter:', cleanPath);
+            console.log('Clean path (no trailing slashes):', cleanPath);
             
-            // Create redirect URL with absolute path
+            // STRICT: Redirect URL must be exactly /nextjsproject/index.html?p= followed by clean path
             var redirectUrl = '/nextjsproject/index.html?p=' + encodeURIComponent(cleanPath);
-            console.log('Redirect URL:', redirectUrl);
+            console.log('STRICT redirect URL:', redirectUrl);
             
             // Redirect immediately
-            console.log('REDIRECTING...');
+            console.log('REDIRECTING WITH STRICT BASE PATH...');
             window.location.replace(redirectUrl);
         })();
     </script>

@@ -35,33 +35,61 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         console.log('🎯 FOUND PATH PARAMETER!')
         console.log('Path parameter value:', pathParam)
         
-        // Clean the path parameter - handle language prefixes and trailing slashes
+        // Strict path extraction - remove unwanted prefixes
         let targetPath = pathParam
         let detectedLanguage: string | null = null
         
-        // Remove trailing slashes to prevent duplication
-        targetPath = targetPath.replace(/\/+$/, '')
-        console.log('Path after removing trailing slashes:', targetPath)
+        console.log('🔍 STRICT PATH EXTRACTION START')
+        console.log('Original path parameter:', targetPath)
         
-        // Detect and extract language prefix if present (e.g., /en/learning/html/post)
-        const languageMatch = targetPath.match(/^\/([a-z]{2})\//)
-        if (languageMatch) {
-          detectedLanguage = languageMatch[1]
-          console.log('🌐 Detected language prefix:', detectedLanguage)
-          console.log('🌐 Removing language prefix from path:', targetPath)
+        // Remove trailing slashes first
+        targetPath = targetPath.replace(/\/+$/, '')
+        console.log('After removing trailing slashes:', targetPath)
+        
+        // Remove /blog/ prefix if present (this is not part of our structure)
+        if (targetPath.startsWith('/blog/')) {
+          console.log('🧹 Removing /blog/ prefix:', targetPath)
+          targetPath = targetPath.replace('/blog/', '/')
+          console.log('After removing /blog/ prefix:', targetPath)
+        }
+        
+        // Remove /en/ prefix if present (language prefix)
+        if (targetPath.startsWith('/en/')) {
+          console.log('🧹 Removing /en/ prefix:', targetPath)
+          targetPath = targetPath.replace('/en/', '/')
+          console.log('After removing /en/ prefix:', targetPath)
+        }
+        
+        // Remove any other language prefixes
+        const languagePrefixMatch = targetPath.match(/^\/([a-z]{2})\//)
+        if (languagePrefixMatch) {
+          const detectedLang = languagePrefixMatch[1]
+          console.log('🧹 Removing language prefix:', detectedLang, 'from:', targetPath)
           targetPath = targetPath.replace(/^\/[a-z]{2}\//, '/')
-          console.log('Path after removing language prefix:', targetPath)
+          console.log('After removing language prefix:', targetPath)
           
           // Set the detected language as current language
-          if (['en', 'my', 'th', 'es', 'zh'].includes(detectedLanguage)) {
-            console.log('🌐 Setting detected language as current language:', detectedLanguage)
-            setLanguage(detectedLanguage as any)
+          if (['en', 'my', 'th', 'es', 'zh'].includes(detectedLang)) {
+            console.log('🌐 Setting detected language as current language:', detectedLang)
+            setLanguage(detectedLang as any)
           }
         }
         
-        // Remove trailing slashes again after language processing
+        // Remove any remaining unwanted prefixes like /nextjsproject/
+        if (targetPath.startsWith('/nextjsproject/')) {
+          console.log('🧹 Removing /nextjsproject/ prefix:', targetPath)
+          targetPath = targetPath.replace('/nextjsproject/', '/')
+          console.log('After removing /nextjsproject/ prefix:', targetPath)
+        }
+        
+        // Ensure path starts with / and remove trailing slashes again
+        if (!targetPath.startsWith('/')) {
+          targetPath = '/' + targetPath
+        }
         targetPath = targetPath.replace(/\/+$/, '')
-        console.log('Final clean path:', targetPath)
+        
+        console.log('🎯 FINAL CLEAN PATH:', targetPath)
+        console.log('🔍 STRICT PATH EXTRACTION END')
         
         // Ensure base path for production - STRICT BASE PATH HANDLING
         if (process.env.NODE_ENV === 'production') {
@@ -99,29 +127,57 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
             let extractedPath = decodeURIComponent(match[1])
             console.log('🎯 EXTRACTED PATH:', extractedPath)
             
+            console.log('🔍 STRICT FALLBACK PATH EXTRACTION START')
+            console.log('Original extracted path:', extractedPath)
+            
             // Remove trailing slashes first
             extractedPath = extractedPath.replace(/\/+$/, '')
-            console.log('Extracted path after removing trailing slashes:', extractedPath)
+            console.log('After removing trailing slashes:', extractedPath)
             
-            // Detect and extract language prefix from extracted path
-            const extractedLanguageMatch = extractedPath.match(/^\/([a-z]{2})\//)
-            if (extractedLanguageMatch) {
-              const extractedLanguage = extractedLanguageMatch[1]
-              console.log('🌐 Detected language prefix in extracted path:', extractedLanguage)
-              console.log('🌐 Removing language prefix from extracted path:', extractedPath)
+            // Remove /blog/ prefix if present (this is not part of our structure)
+            if (extractedPath.startsWith('/blog/')) {
+              console.log('🧹 Removing /blog/ prefix from fallback:', extractedPath)
+              extractedPath = extractedPath.replace('/blog/', '/')
+              console.log('After removing /blog/ prefix:', extractedPath)
+            }
+            
+            // Remove /en/ prefix if present (language prefix)
+            if (extractedPath.startsWith('/en/')) {
+              console.log('🧹 Removing /en/ prefix from fallback:', extractedPath)
+              extractedPath = extractedPath.replace('/en/', '/')
+              console.log('After removing /en/ prefix:', extractedPath)
+            }
+            
+            // Remove any other language prefixes
+            const fallbackLanguageMatch = extractedPath.match(/^\/([a-z]{2})\//)
+            if (fallbackLanguageMatch) {
+              const detectedLang = fallbackLanguageMatch[1]
+              console.log('🧹 Removing language prefix from fallback:', detectedLang, 'from:', extractedPath)
               extractedPath = extractedPath.replace(/^\/[a-z]{2}\//, '/')
-              console.log('Path after removing language prefix:', extractedPath)
+              console.log('After removing language prefix:', extractedPath)
               
               // Set the detected language as current language
-              if (['en', 'my', 'th', 'es', 'zh'].includes(extractedLanguage)) {
-                console.log('🌐 Setting detected language as current language:', extractedLanguage)
-                setLanguage(extractedLanguage as any)
+              if (['en', 'my', 'th', 'es', 'zh'].includes(detectedLang)) {
+                console.log('🌐 Setting detected language as current language:', detectedLang)
+                setLanguage(detectedLang as any)
               }
             }
             
-            // Remove trailing slashes again after language processing
+            // Remove any remaining unwanted prefixes like /nextjsproject/
+            if (extractedPath.startsWith('/nextjsproject/')) {
+              console.log('🧹 Removing /nextjsproject/ prefix from fallback:', extractedPath)
+              extractedPath = extractedPath.replace('/nextjsproject/', '/')
+              console.log('After removing /nextjsproject/ prefix:', extractedPath)
+            }
+            
+            // Ensure path starts with / and remove trailing slashes again
+            if (!extractedPath.startsWith('/')) {
+              extractedPath = '/' + extractedPath
+            }
             extractedPath = extractedPath.replace(/\/+$/, '')
-            console.log('Final extracted path:', extractedPath)
+            
+            console.log('🎯 FINAL CLEAN FALLBACK PATH:', extractedPath)
+            console.log('🔍 STRICT FALLBACK PATH EXTRACTION END')
             
             let targetPath = extractedPath
             // Ensure base path for production - STRICT BASE PATH HANDLING
