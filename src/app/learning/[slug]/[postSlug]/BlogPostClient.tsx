@@ -71,20 +71,51 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
     }
   }
 
-  // Client-side fetch to get the latest post data with cache-busting
+  // Client-side fetch to get the latest post data with language-aware fetching
   useEffect(() => {
     const fetchLatestPost = async () => {
       if (!post?.slug || !mounted) return
       
       setLoading(true)
       try {
-        console.log('=== SIMPLE POST FETCH FOR NEW POSTS ===')
+        console.log('=== LANGUAGE-AWARE POST FETCH ===')
         console.log('Fetching post data for:', post.slug)
         console.log('Current pathname:', pathname)
         console.log('Window URL:', typeof window !== 'undefined' ? window.location.href : 'N/A')
+        console.log('Current language:', currentLanguage)
+        console.log('Effective locale:', effectiveLocale)
         
-        // Simple direct fetch from Supabase
-        const { data: latestPost, error } = await supabase
+        // Language-aware fetching - try current language first, then fallback
+        let latestPost = null
+        let error = null
+        
+        // First try: Current language
+        console.log('🔍 Trying current language:', currentLanguage)
+        const { data: currentLangPost, error: currentLangError } = await supabase
+          .from('blogs')
+          .select(`
+            *,
+            categories(id, name, slug)
+          `)
+          .eq('slug', post.slug)
+          .eq('language', currentLanguage)
+          .eq('status', 'published')
+          .single()
+
+        if (currentLangPost && !currentLangError) {
+          console.log('✅ POST FOUND IN CURRENT LANGUAGE!')
+          console.log('Title:', currentLangPost.title)
+          console.log('Language:', currentLangPost.language)
+          setCurrentPost(currentLangPost)
+          return
+        } else {
+          console.log('❌ Post not found in current language, trying fallback...')
+          console.log('Error:', currentLangError)
+        }
+        
+        // Second try: Any language (fallback)
+        console.log('🔍 Trying any language as fallback...')
+        const { data: anyLangPost, error: anyLangError } = await supabase
           .from('blogs')
           .select(`
             *,
@@ -94,17 +125,16 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           .eq('status', 'published')
           .single()
 
-        if (latestPost && !error) {
-          console.log('✅ POST FOUND IN SUPABASE!')
-          console.log('Title:', latestPost.title)
-          console.log('Category:', latestPost.categories?.slug)
-          console.log('Language:', latestPost.language)
-          setCurrentPost(latestPost)
+        if (anyLangPost && !anyLangError) {
+          console.log('✅ POST FOUND IN FALLBACK LANGUAGE!')
+          console.log('Title:', anyLangPost.title)
+          console.log('Language:', anyLangPost.language)
+          setCurrentPost(anyLangPost)
         } else {
           console.log('❌ POST NOT FOUND WITH SINGLE QUERY')
-          console.log('Error:', error)
+          console.log('Error:', anyLangError)
           
-          // Try without .single() to get array
+          // Third try: Array query as last resort
           const { data: postsArray, error: arrayError } = await supabase
             .from('blogs')
             .select(`
@@ -117,6 +147,7 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
           if (postsArray && postsArray.length > 0 && !arrayError) {
             console.log('✅ POST FOUND WITH ARRAY QUERY!')
             console.log('Title:', postsArray[0].title)
+            console.log('Language:', postsArray[0].language)
             setCurrentPost(postsArray[0])
           } else {
             console.log('❌ POST NOT FOUND AT ALL')
@@ -135,7 +166,7 @@ export default function BlogPostClient({ post, category }: BlogPostClientProps) 
     // Set mounted state and fetch latest data
     setMounted(true)
     fetchLatestPost()
-  }, [post?.slug, mounted, pathname])
+  }, [post?.slug, mounted, pathname, currentLanguage, effectiveLocale])
 
   console.log('=== DYNAMIC BLOG POST CLIENT DEBUG ===')
   console.log('Pathname:', pathname)

@@ -18,12 +18,12 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
   }, [])
 
   useEffect(() => {
-    // Simple and direct parameter interception
+    // Simple and direct parameter interception with language prefix handling
     if (typeof window !== 'undefined' && mounted) {
       const url = new URL(window.location.href)
       const pathParam = url.searchParams.get('p')
       
-      console.log('=== SIMPLE ROUTE CATCHER ===')
+      console.log('=== ROUTE CATCHER WITH LANGUAGE SUPPORT ===')
       console.log('Full URL:', window.location.href)
       console.log('Pathname:', pathname)
       console.log('Search params:', url.search)
@@ -33,8 +33,15 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         console.log('🎯 FOUND PATH PARAMETER!')
         console.log('Path parameter value:', pathParam)
         
-        // Clean the path parameter
+        // Clean the path parameter - handle language prefixes
         let targetPath = pathParam
+        
+        // Remove language prefix if present (e.g., /en/learning/html/post)
+        if (targetPath.match(/^\/[a-z]{2}\//)) {
+          console.log('🌐 Detected language prefix, removing:', targetPath)
+          targetPath = targetPath.replace(/^\/[a-z]{2}\//, '/')
+          console.log('Path after removing language prefix:', targetPath)
+        }
         
         // Ensure base path for production
         if (process.env.NODE_ENV === 'production') {
@@ -61,14 +68,21 @@ export default function RouteCatcher({ children }: RouteCatcherProps) {
         
         // Check if we're on the index page with search params
         if (pathname === '/' && url.search) {
-          console.log('� Checking index page for hidden parameters...')
+          console.log('🔍 Checking index page for hidden parameters...')
           console.log('Raw search string:', url.search)
           
           // Manual extraction as fallback
           const match = url.search.match(/[?&]p=([^&]+)/)
           if (match) {
-            const extractedPath = decodeURIComponent(match[1])
+            let extractedPath = decodeURIComponent(match[1])
             console.log('🎯 EXTRACTED PATH:', extractedPath)
+            
+            // Remove language prefix if present
+            if (extractedPath.match(/^\/[a-z]{2}\//)) {
+              console.log('🌐 Removing language prefix from extracted path:', extractedPath)
+              extractedPath = extractedPath.replace(/^\/[a-z]{2}\//, '/')
+              console.log('Path after removing language prefix:', extractedPath)
+            }
             
             let targetPath = extractedPath
             if (process.env.NODE_ENV === 'production') {

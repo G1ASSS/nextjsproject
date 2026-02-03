@@ -47,56 +47,20 @@ const Navbar = () => {
     setIsMobileMenuOpen(false)
   }
 
-  // Handle language switching with URL redirection
+  // Handle language switching - STAY ON CURRENT PAGE
   const handleLanguageSwitch = (newLanguage: string) => {
+    console.log('=== LANGUAGE SWITCH - STAY ON PAGE ===')
+    console.log('Current language:', currentLanguage)
+    console.log('New language:', newLanguage)
+    console.log('Current pathname:', pathname)
+    
+    // Just change the language state - NO NAVIGATION
     setLanguage(newLanguage as any)
     setIsLanguageDropdownOpen(false)
     closeMobileMenu()
-
-    // Use pathname from Next.js router (includes base path handling)
-    const currentPath = pathname
     
-    console.log('Language switch debug:', { currentPath, newLanguage })
-    
-    // Handle blog post pages - use same slug for all languages
-    if (currentPath.startsWith('/learning/') && currentPath.split('/').length >= 4) {
-      const pathParts = currentPath.split('/')
-      const categorySlug = pathParts[2] // /learning/[slug]/[postSlug] -> [slug]
-      let postSlug = pathParts[3] // /learning/[slug]/[postSlug] -> [postSlug]
-      
-      console.log('Blog post detected:', { categorySlug, postSlug })
-      
-      // Remove any existing -my suffix (both languages use same slug now)
-      const cleanPostSlug = postSlug.replace('-my', '')
-      
-      // Keep the same URL structure, just change language state
-      const newPath = `/learning/${categorySlug}/${cleanPostSlug}`
-      console.log('Navigating to:', newPath)
-      
-      // Navigate to the new URL
-      router.push(newPath)
-    }
-    // Handle category pages - stay on same page, content updates via language filter
-    else if (currentPath.startsWith('/learning/') && currentPath.split('/').length === 3) {
-      console.log('Category page detected, staying on current page')
-      // Just stay on the same category page, content will update via language filter
-      // No URL change needed for category pages since both languages use same slug
-    }
-    // Handle main learning page
-    else if (currentPath === '/learning') {
-      console.log('Learning page detected, staying on current page')
-      // Stay on learning page, content updates via language filter
-    }
-    // Handle home page - stay on home
-    else if (currentPath === '/') {
-      console.log('Home page detected, staying on current page')
-      // Stay on home page, content updates via language filter
-    }
-    // Handle all other pages - redirect to learning page
-    else {
-      console.log('Other page detected, redirecting to learning')
-      router.push('/learning')
-    }
+    console.log('✅ Language changed without navigation')
+    console.log('=== END LANGUAGE SWITCH ===')
   }
 
   const languages = [
